@@ -34,8 +34,6 @@ jobs:
           -Dsonar.exclusions=**/vendor/**,**/*_test.go
           -Dsonar.tests=.
           -Dsonar.test.inclusions=**/*_test.go
-          -Dsonar.branch.name=${{ github.ref_name }}
-          -Dsonar.branch.target=${{ github.event.repository.default_branch }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
