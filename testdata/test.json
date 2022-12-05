@@ -1,0 +1,12 @@
+{
+    "desc": "test file"
+    {{- if .Name }},
+    "name": "{{ .Name }}"
+    {{- end }}
+    {{- range readDir "." }},
+    "{{ .Name }}": {
+        "isDir": "{{ .IsDir }}",
+        "size": "{{ .Size | uint64 | bytes }}"
+    }
+    {{- end }}
+}

@@ -1,0 +1,4 @@
+/go.work*
+/*.json
+/dist
+/.golangci.yml
