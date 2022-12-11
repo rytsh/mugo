@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -17,6 +18,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/worldline-go/logz"
 
+	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/pkg/template"
 )
@@ -30,9 +32,9 @@ type AppInfo struct {
 var ErrShutdown = errors.New("shutting down signal received")
 
 var rootCmd = &cobra.Command{
-	Use:           "mugo template.tpl",
+	Use:           "mugo <template>",
 	Short:         "go template executor",
-	Long:          "execute go template and export it to stdout or file",
+	Long:          banner.Logo + "execute go template and export it to stdout or file",
 	SilenceUsage:  true,
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
@@ -47,7 +49,8 @@ var rootCmd = &cobra.Command{
 	},
 
 	Example: "mugo -d @data.yaml template.tpl" + "\n" +
-		`mugo -d '{"Name": "mugo"}' -o output.txt template.tpl`,
+		`mugo -d '{"Name": "mugo"}' -o output.txt template.tpl` + "\n" +
+		`mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		if config.App.List {
 			log.Info().Msg("print function list")
@@ -57,7 +60,7 @@ var rootCmd = &cobra.Command{
 		}
 
 		if len(args) == 0 {
-			return fmt.Errorf("no input file")
+			return fmt.Errorf("missing template file")
 		}
 
 		if config.App.Delims != "" {
@@ -69,14 +72,38 @@ var rootCmd = &cobra.Command{
 			config.Checked.Delims = fields
 		}
 
-		workDir, err := filepath.Abs(filepath.Clean(args[0]))
-		if err != nil {
-			return fmt.Errorf("failed to get absolute path: %w", err)
+		var (
+			inputReader io.Reader = cmd.InOrStdin()
+			isFile                = false
+		)
+
+		info := os.Stdin.Name()
+
+		// the argument received looks like a file, we try to open it
+		if len(args) > 0 && args[0] != "-" {
+			isFile = true
+			file, err := os.Open(args[0])
+			if err != nil {
+				return fmt.Errorf("failed open file: %v", err)
+			}
+
+			defer file.Close()
+
+			inputReader = file
+
+			info = args[0]
 		}
 
-		config.Checked.WorkDir = filepath.Dir(workDir)
+		if isFile {
+			workDir, err := filepath.Abs(filepath.Clean(args[0]))
+			if err != nil {
+				return fmt.Errorf("failed to get absolute path: %w", err)
+			}
 
-		return mugo(cmd.Context(), args)
+			config.Checked.WorkDir = filepath.Dir(workDir)
+		}
+
+		return mugo(cmd.Context(), inputReader, info)
 	},
 }
 
@@ -90,13 +117,14 @@ func Execute(ctx context.Context, appInfo AppInfo) error {
 
 func init() {
 	rootCmd.Flags().StringVar(&config.App.Delims, "delims", config.App.Delims, "comma or space separated list of delimiters to alternate the default \"{{ }}\"")
-	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix")
+	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension")
+	rootCmd.Flags().StringVarP(&config.App.Parse, "parse", "p", config.App.Parse, "parse file pattern for define templates 'testdata/**/*.tpl'")
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
 	rootCmd.Flags().BoolVarP(&config.App.Silience, "silience", "s", config.App.Silience, "silience log")
 	rootCmd.Flags().BoolVarP(&config.App.List, "list", "l", config.App.List, "function List")
 }
 
-func mugo(ctx context.Context, inputs []string) (err error) {
+func mugo(ctx context.Context, input io.Reader, info string) (err error) {
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
 
@@ -122,8 +150,10 @@ func mugo(ctx context.Context, inputs []string) (err error) {
 		}
 	}()
 
-	tpl := template.New()
-	tpl.SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
+	tpl, err := template.New().SetDelims(config.Checked.Delims[0], config.Checked.Delims[1]).ParseGlob(config.App.Parse)
+	if err != nil {
+		return err
+	}
 
 	output := os.Stdout
 	if config.App.Output != "" {
@@ -157,15 +187,14 @@ func mugo(ctx context.Context, inputs []string) (err error) {
 	}
 
 	log.Info().Msgf("output: %s", output.Name())
-	log.Info().Msgf("execute template: %s", inputs[0])
+	log.Info().Msgf("execute template: %s", info)
 
-	// open file
-	v, err := os.ReadFile(inputs[0])
+	content, err := io.ReadAll(input)
 	if err != nil {
-		return fmt.Errorf("failed to read file: %w", err)
+		return fmt.Errorf("failed to read input: %w", err)
 	}
 
-	if err := tpl.ExecuteContent(output, inputData, v); err != nil {
+	if err := tpl.ExecuteContent(output, inputData, content); err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
 

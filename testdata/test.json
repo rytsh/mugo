@@ -6,7 +6,8 @@
     {{- range readDir "." }},
     "{{ .Name }}": {
         "isDir": "{{ .IsDir }}",
-        "size": "{{ .Size | uint64 | bytes }}"
+        "size": "{{ .Size | uint64 | bytes }}",
+        {{template "view.tpl" .Name}}
     }
     {{- end }}
 }

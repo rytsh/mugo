@@ -40,7 +40,9 @@ func (t *Template) Reset() {
 	t.template = textTemplate.New("txt")
 }
 
-func (t *Template) SetDelims(left, right string) {
+// SetDelims sets the template delimiters to the specified strings
+// and returns the template to allow chaining.
+func (t *Template) SetDelims(left, right string) *Template {
 	if left == "" {
 		left = "{{"
 	}
@@ -50,11 +52,28 @@ func (t *Template) SetDelims(left, right string) {
 	}
 
 	t.template.Delims(left, right)
+
+	return t
 }
 
 func (t *Template) setFunctions() {
 	t.funcs = functions.Global.InitializeFuncs().Funcs()
 	t.template.Funcs(t.funcs)
+}
+
+func (t *Template) ParseGlob(pattern string) (*Template, error) {
+	if pattern == "" {
+		return t, nil
+	}
+
+	tpl, err := t.template.ParseGlob(pattern)
+	if err != nil {
+		return nil, fmt.Errorf("Parse error: %w", err)
+	}
+
+	t.template = tpl
+
+	return t, nil
 }
 
 func (t *Template) Execute(v any, content string) (string, error) {
@@ -68,8 +87,14 @@ func (t *Template) Execute(v any, content string) (string, error) {
 }
 
 func (t *Template) ExecuteContent(writer io.Writer, v any, content []byte) error {
+	// tpl, err := t.template.Clone()
+	// if err != nil {
+	// 	return fmt.Errorf("ExecuteContent clone error: %w", err)
+	// }
+
+	tpl := t.template
 	// Execute the template and write the output to the buffer
-	if err := textTemplate.Must(t.template.Parse(string(content))).Execute(writer, v); err != nil {
+	if err := textTemplate.Must(tpl.Parse(string(content))).Execute(writer, v); err != nil {
 		return fmt.Errorf("ExecuteContent error: %w", err)
 	}
 

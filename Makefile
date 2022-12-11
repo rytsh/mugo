@@ -12,10 +12,13 @@ GOLANGCI_LINT_VERSION := v1.50.0
 
 .DEFAULT_GOAL := help
 
-.PHONY: build golangci lint run test coverage clean help
+.PHONY: build golangci lint run test-data test coverage clean help
 
 run: ## Run the application
 	go run $(MAIN_FILE)
+
+test-data: ## Run the application
+	go run $(MAIN_FILE) -d @testdata/input.toml -p 'testdata/**/*.tpl' testdata/test.json
 
 build: ## Build the binary file
 	goreleaser build --snapshot --rm-dist --single-target
