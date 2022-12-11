@@ -17,18 +17,20 @@ Input file could be anything which can include go template syntax.
 
 ```
 Usage:
-  mugo template.tpl [flags]
+  mugo <template> [flags]
 
 Examples:
 mugo -d @data.yaml template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt template.tpl
+mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl
 
 Flags:
-  -d, --data stringArray   input data as json/yaml or file path with @ prefix
+  -d, --data stringArray   input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
       --delims string      comma or space separated list of delimiters to alternate the default "{{ }}"
   -h, --help               help for mugo
   -l, --list               function List
   -o, --output string      output file, default is stdout
+  -p, --parse string       parse file pattern for define templates 'testdata/**/*.tpl'
   -s, --silience           silience log
   -v, --version            version for mugo
 ```
