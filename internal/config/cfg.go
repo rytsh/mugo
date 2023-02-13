@@ -9,12 +9,14 @@ var (
 )
 
 type Config struct {
-	Data     []string
-	Parse    string
-	Delims   string
-	Output   string
-	Silience bool
-	List     bool
+	Data      []string
+	DataRaw   string
+	Parse     []string
+	Delims    string
+	Output    string
+	Silience  bool
+	List      bool
+	DisableAt bool
 }
 
 type Check struct {

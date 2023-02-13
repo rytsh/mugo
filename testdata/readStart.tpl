@@ -1,0 +1,1 @@
+{{ execTemplate "read.tpl" . | mustFromJson | mustToPrettyJson }}
