@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -23,6 +24,8 @@ import (
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/render"
+	"github.com/rytsh/mugo/internal/request"
+	"github.com/rytsh/mugo/internal/shutdown"
 )
 
 type AppInfo struct {
@@ -41,7 +44,12 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if config.App.Silience {
-			err := logz.SetLogLevel("panic")
+			err := logz.SetLogLevel("fatal")
+			if err != nil {
+				log.Error().Err(err).Msg("failed to set log level")
+			}
+		} else {
+			err := logz.SetLogLevel(config.App.LogLevel)
 			if err != nil {
 				log.Error().Err(err).Msg("failed to set log level")
 			}
@@ -54,10 +62,11 @@ var rootCmd = &cobra.Command{
 		`mugo -d '{"Name": "mugo"}' -o output.txt template.tpl` + "\n" +
 		`mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl`,
 	RunE: func(cmd *cobra.Command, args []string) error {
+		ctx := cmd.Context()
+
 		if config.App.List {
 			log.Info().Msg("print function list")
-			tpl := templatex.New()
-			tpl.AddFunc(render.FuncMap(tpl))
+			tpl := templatex.New(functions.WithAddFuncsTpl(render.FuncMap(config.App.Trust)))
 			tpl.ListFunctions()
 
 			return nil
@@ -79,23 +88,41 @@ var rootCmd = &cobra.Command{
 		var (
 			inputReader io.Reader = cmd.InOrStdin()
 			isFile                = false
+			inputData   []byte
 		)
 
 		info := os.Stdin.Name()
 
 		// the argument received looks like a file, we try to open it
 		if len(args) > 0 && args[0] != "-" {
-			isFile = true
-			file, err := os.Open(args[0])
-			if err != nil {
-				return fmt.Errorf("failed open file: %v", err)
+			// if p is an http url, we try to download it
+			if _, err := url.ParseRequestURI(args[0]); err == nil {
+				httpReq := request.New()
+				body, err := httpReq.Get(ctx, args[0])
+				if err != nil {
+					return err
+				}
+
+				inputData = body
+			} else {
+				isFile = true
+				body, err := os.ReadFile(args[0])
+				if err != nil {
+					return err
+				}
+
+				inputData = body
 			}
 
-			defer file.Close()
-
-			inputReader = file
-
 			info = args[0]
+		} else {
+			// read from stdin
+			body, err := io.ReadAll(inputReader)
+			if err != nil {
+				return err
+			}
+
+			inputData = body
 		}
 
 		if isFile {
@@ -107,7 +134,7 @@ var rootCmd = &cobra.Command{
 			config.Checked.WorkDir = filepath.Dir(workDir)
 		}
 
-		return mugo(cmd.Context(), inputReader, info)
+		return mugo(ctx, inputData, info)
 	},
 }
 
@@ -126,16 +153,23 @@ func init() {
 	rootCmd.Flags().StringArrayVarP(&config.App.Parse, "parse", "p", config.App.Parse, "parse file pattern for define templates 'testdata/**/*.tpl'")
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
 	rootCmd.Flags().BoolVarP(&config.App.Silience, "silience", "s", config.App.Silience, "silience log")
-	rootCmd.Flags().BoolVarP(&config.App.List, "list", "l", config.App.List, "function List")
-	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.List, "disable @ prefix for file path")
+	rootCmd.Flags().BoolVarP(&config.App.List, "list", "l", config.App.List, "function list")
+	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.DisableAt, "disable @ prefix for file path")
+	rootCmd.Flags().BoolVarP(&config.App.Trust, "trust", "t", config.App.Trust, "trust to execute dangerous functions")
+	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
+	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry")
+	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
 }
 
-func mugo(ctx context.Context, input io.Reader, info string) (err error) {
+func mugo(ctx context.Context, input []byte, info string) (err error) {
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
 
 	ctx, ctxCancel := context.WithCancel(ctx)
 	defer ctxCancel()
+
+	wg.Add(1)
+	go shutdown.Global.WatchCtx(ctx, wg)
 
 	wg.Add(1)
 	go func() {
@@ -156,8 +190,24 @@ func mugo(ctx context.Context, input io.Reader, info string) (err error) {
 		}
 	}()
 
-	tpl := templatex.New(functions.WithAddFuncsTpl(render.FuncMap)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
+	httpReq := request.New()
+
+	tpl := templatex.New(functions.WithAddFuncsTpl(render.FuncMap(config.App.Trust))).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
 	for _, p := range config.App.Parse {
+		// if p is an http url, we try to download it
+		if _, err := url.ParseRequestURI(p); err == nil {
+			body, err := httpReq.Get(ctx, p)
+			if err != nil {
+				return err
+			}
+
+			if err := tpl.Parse(string(body)); err != nil {
+				return fmt.Errorf("failed to parse template: %w", err)
+			}
+
+			continue
+		}
+
 		if err := tpl.ParseGlob(p); err != nil {
 			return fmt.Errorf("failed to parse glob: %w", err)
 		}
@@ -212,19 +262,14 @@ func mugo(ctx context.Context, input io.Reader, info string) (err error) {
 	log.Info().Msgf("output: %s", output.Name())
 	log.Info().Msgf("execute template: %s", info)
 
-	content, err := ReadAll(input)
-	if err != nil {
-		return fmt.Errorf("failed to read input: %w", err)
-	}
-
-	if err := tpl.Parse(content); err != nil {
+	if err := tpl.Parse(string(input)); err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
 
 	if err := tpl.Execute(
 		templatex.WithIO(output),
 		templatex.WithData(inputData),
-		templatex.WithContent(content),
+		templatex.WithParsed(true),
 	); err != nil {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}

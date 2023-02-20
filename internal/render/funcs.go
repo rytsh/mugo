@@ -1,15 +1,39 @@
 package render
 
-import "github.com/rytsh/liz/utils/templatex"
+import (
+	"github.com/rytsh/liz/utils/templatex"
+)
 
-func FuncMap(t *templatex.Template) map[string]interface{} {
-	fMap := map[string]interface{}{
-		"execTemplate": execTemplate(t),
-		"rfc3339":      rfc3339,
-		"saveFile":     saveFile,
-		"logOutput":    logOutput,
-		"nothing":      nothing,
+func FuncMap(trust bool) func(t *templatex.Template) map[string]interface{} {
+	return func(t *templatex.Template) map[string]interface{} {
+		// safe functions
+		fMap := map[string]interface{}{
+			"execTemplate": ExecTemplate(t),
+			"rfc3339":      Rfc3339,
+			"readFile":     ReadFile,
+			"log":          Log,
+			"nothing":      Nothing,
+			"byteToString": ByteToString,
+			"stringToByte": StringToByte,
+			"md":           Md,
+			"hold":         Hold,
+			"getHold":      GetHold,
+			"getData":      GetData,
+			"indentByte":   IndentByte,
+			"md5":          MD5,
+			"sha1":         SHA1,
+			"sha256":       SHA256,
+			"fnv32a":       FNV32a,
+			"hmac":         HMAC,
+			"minify":       Minify,
+		}
+
+		if trust {
+			// unsafe functions
+			fMap["exec"] = Exec
+			fMap["saveFile"] = SaveFile
+		}
+
+		return fMap
 	}
-
-	return fMap
 }

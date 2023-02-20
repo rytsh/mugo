@@ -25,11 +25,21 @@ func main() {
 		BuildDate:   date,
 	}
 
-	if err := args.Execute(context.Background(), appInfo); err != nil {
+	var err error
+	defer func() {
+		// recover from panic if one occured to prevent os.Exit
+		if r := recover(); r != nil {
+			log.Fatal().Msgf("%v", r)
+		}
+
+		if err != nil {
+			os.Exit(1)
+		}
+	}()
+
+	if err = args.Execute(context.Background(), appInfo); err != nil {
 		if !errors.Is(err, args.ErrShutdown) {
 			log.Error().Err(err).Msg("failed to execute command")
 		}
-
-		os.Exit(1)
 	}
 }

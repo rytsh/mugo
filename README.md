@@ -25,14 +25,20 @@ mugo -d '{"Name": "mugo"}' -o output.txt template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl
 
 Flags:
-  -d, --data stringArray   input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
-      --delims string      comma or space separated list of delimiters to alternate the default "{{ }}"
-  -h, --help               help for mugo
-  -l, --list               function List
-  -o, --output string      output file, default is stdout
-  -p, --parse string       parse file pattern for define templates 'testdata/**/*.tpl'
-  -s, --silience           silience log
-  -v, --version            version for mugo
+  -d, --data stringArray    input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
+  -r, --data-raw string     input data as raw or file path with @ prefix could be file with any extension
+      --delims string       comma or space separated list of delimiters to alternate the default "{{ }}"
+  -h, --help                help for mugo
+  -k, --insecure            skip verify ssl certificate
+  -l, --list                function list
+      --log-level string    log level (debug, info, warn, error, fatal, panic), default is info (default "info")
+      --no-at               disable @ prefix for file path
+      --no-retry            disable retry
+  -o, --output string       output file, default is stdout
+  -p, --parse stringArray   parse file pattern for define templates 'testdata/**/*.tpl'
+  -s, --silience            silience log
+  -t, --trust               trust to execute dangerous functions
+  -v, --version             version for mugo
 ```
 
 ### Development
@@ -52,7 +58,7 @@ make build
 
 ```sh
 go run cmd/mugo/main.go -r "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
-go run cmd/mugo/main.go -r "." -p 'testdata/tpl/*.tpl' - < testdata/readSeparateStart.tpl
+go run cmd/mugo/main.go -t -r "." -p 'testdata/tpl/*.tpl' - < testdata/readSeparateStart.tpl
 ```
 
 </details>

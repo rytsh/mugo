@@ -6,10 +6,14 @@ import (
 
 var fileAPI = file.New()
 
-func saveFile(fileName string, data string) (bool, error) {
-	if err := fileAPI.SetRaw(fileName, []byte(data)); err != nil {
+func SaveFile(fileName string, data []byte) (bool, error) {
+	if err := fileAPI.SetRaw(fileName, data); err != nil {
 		return false, err
 	}
 
 	return true, nil
+}
+
+func ReadFile(fileName string) ([]byte, error) {
+	return fileAPI.LoadRaw(fileName)
 }

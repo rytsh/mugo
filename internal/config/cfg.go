@@ -1,7 +1,9 @@
 package config
 
 var (
-	App     = Config{}
+	App = Config{
+		LogLevel: "info",
+	}
 	Checked = Check{
 		Delims:  []string{"", ""},
 		WorkDir: ".",
@@ -9,14 +11,18 @@ var (
 )
 
 type Config struct {
-	Data      []string
-	DataRaw   string
-	Parse     []string
-	Delims    string
-	Output    string
-	Silience  bool
-	List      bool
-	DisableAt bool
+	LogLevel     string
+	Data         []string
+	DataRaw      string
+	Parse        []string
+	Delims       string
+	Output       string
+	Silience     bool
+	List         bool
+	DisableAt    bool
+	Trust        bool
+	SkipVerify   bool
+	DisableRetry bool
 }
 
 type Check struct {
