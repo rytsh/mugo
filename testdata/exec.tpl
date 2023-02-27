@@ -1,1 +1,1 @@
-{{ exec "echo -n 'Hello World'" | getData "stdout" | byteToString }}
+{{ exec "echo -n 'Hello World'" | map.Get "stdout" | codec.ByteToString }}

@@ -1,1 +1,1 @@
-{{- execTemplate "readSeparate.tpl" . | mustFromJson | mustToPrettyJson | stringToByte | saveFile "output/info.json" | nothing -}}
+{{- execTemplate "readSeparate.tpl" . | mustFromJson | mustToPrettyJson | codec.StringToByte | file.Save "output/info.json" | nothing -}}

@@ -29,7 +29,7 @@ func main() {
 	defer func() {
 		// recover from panic if one occured to prevent os.Exit
 		if r := recover(); r != nil {
-			log.Fatal().Msgf("%v", r)
+			log.Panic().Msgf("%v", r)
 		}
 
 		if err != nil {

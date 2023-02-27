@@ -1,4 +1,4 @@
-{{- $body := (readFile "testdata/data/index.md" | md | byteToString) -}}
+{{- $body := (file.Read "testdata/data/index.md" | codec.Markdown | codec.ByteToString) -}}
 {{- define "layout" -}}
 <!DOCTYPE html>
 <html lang="en">

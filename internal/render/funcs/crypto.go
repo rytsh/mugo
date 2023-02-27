@@ -1,4 +1,4 @@
-package render
+package funcs
 
 import (
 	"crypto/hmac"
@@ -11,10 +11,17 @@ import (
 	"hash"
 	"hash/fnv"
 
+	"github.com/rytsh/mugo/internal/render/generic"
 	"github.com/spf13/cast"
 )
 
-func MD5(v any) (string, error) {
+func init() {
+	generic.CallReg.AddFunction("crypto", generic.ReturnWithFn(Crypto{}))
+}
+
+type Crypto struct{}
+
+func (Crypto) MD5(v any) (string, error) {
 	conv, err := cast.ToStringE(v)
 	if err != nil {
 		return "", err
@@ -25,7 +32,7 @@ func MD5(v any) (string, error) {
 }
 
 // SHA1 hashes v and returns its SHA1 checksum.
-func SHA1(v any) (string, error) {
+func (Crypto) SHA1(v any) (string, error) {
 	conv, err := cast.ToStringE(v)
 	if err != nil {
 		return "", err
@@ -36,7 +43,7 @@ func SHA1(v any) (string, error) {
 }
 
 // SHA256 hashes v and returns its SHA256 checksum.
-func SHA256(v any) (string, error) {
+func (Crypto) SHA256(v any) (string, error) {
 	conv, err := cast.ToStringE(v)
 	if err != nil {
 		return "", err
@@ -47,7 +54,7 @@ func SHA256(v any) (string, error) {
 }
 
 // FNV32a hashes v using fnv32a algorithm.
-func FNV32a(v any) (int, error) {
+func (Crypto) FNV32a(v any) (int, error) {
 	conv, err := cast.ToStringE(v)
 	if err != nil {
 		return 0, err
@@ -57,7 +64,7 @@ func FNV32a(v any) (int, error) {
 	return int(algorithm.Sum32()), nil
 }
 
-func HMAC(h interface{}, k interface{}, m interface{}) (string, error) {
+func (Crypto) HMAC(h interface{}, k interface{}, m interface{}) (string, error) {
 	ha, err := cast.ToStringE(h)
 	if err != nil {
 		return "", err

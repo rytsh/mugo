@@ -1,1 +1,1 @@
-{{ md5 "Turkey Hatay" }}
+{{ crypto.MD5 "Turkey Hatay" }}

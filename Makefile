@@ -23,6 +23,9 @@ test-data: ## Run the application
 build: ## Build the binary file
 	goreleaser build --snapshot --rm-dist --single-target
 
+copy-bin: ## Copy the binary file to the /usr/local/bin directory
+	cp ./dist/$(BINARY)_linux_amd64_v1/$(BINARY) ~/bin/$(BINARY)
+
 .golangci.yml:
 	@$(MAKE) golangci
 

@@ -1,4 +1,4 @@
-package render
+package funcs
 
 import (
 	"io"
@@ -6,10 +6,29 @@ import (
 
 	"github.com/cli/safeexec"
 	"github.com/kballard/go-shellquote"
+	"github.com/rytsh/mugo/internal/render/generic"
 	"github.com/rytsh/mugo/internal/shutdown"
 )
 
-func Exec(cli string) (map[string]interface{}, error) {
+func init() {
+	generic.CallReg.AddFunction("exec", new(Exec).init, "trust")
+}
+
+type Exec struct {
+	trust bool
+}
+
+func (e Exec) init(trust bool) any {
+	e.trust = trust
+
+	return e.Exec
+}
+
+func (e Exec) Exec(cli string) (map[string]interface{}, error) {
+	if !e.trust {
+		return nil, generic.ErrTrustRequired
+	}
+
 	commands, err := shellquote.Split(cli)
 	if err != nil {
 		return nil, err

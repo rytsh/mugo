@@ -1,4 +1,4 @@
-package render
+package funcs
 
 import (
 	"reflect"
@@ -64,11 +64,10 @@ func Test_hold(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if tt.hold != nil {
-				hMap = tt.hold
-			}
+			m := Map{value: tt.hold}
+			m.init()
 
-			if got := Hold(tt.args.key, tt.args.value); !reflect.DeepEqual(got, tt.want) {
+			if got := m.Set(tt.args.key, tt.args.value); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("hold() = %v, want %v", got, tt.want)
 			}
 		})
@@ -79,6 +78,7 @@ func TestGetData(t *testing.T) {
 	type args struct {
 		key  string
 		data map[string]interface{}
+		hold map[string]interface{}
 	}
 	tests := []struct {
 		name string
@@ -94,6 +94,13 @@ func TestGetData(t *testing.T) {
 				},
 			},
 			want: "value",
+		},
+		{
+			name: "get data with nil",
+			args: args{
+				key: "key",
+			},
+			want: nil,
 		},
 		{
 			name: "get nested data",
@@ -123,10 +130,28 @@ func TestGetData(t *testing.T) {
 			},
 			want: nil,
 		},
+		{
+			name: "from hold",
+			args: args{
+				key: "key/nested/y",
+				hold: map[string]interface{}{
+					"key": map[string]interface{}{
+						"nested": map[string]interface{}{
+							"y": "value",
+						},
+					},
+				},
+			},
+			want: "value",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetData(tt.args.key, tt.args.data); !reflect.DeepEqual(got, tt.want) {
+			m := Map{}
+			m.init()
+			m.value = tt.args.hold
+
+			if got := m.Get(tt.args.key, tt.args.data); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GetData() = %v, want %v", got, tt.want)
 			}
 		})

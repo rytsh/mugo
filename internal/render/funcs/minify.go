@@ -1,9 +1,10 @@
-package render
+package funcs
 
 import (
 	"bytes"
 	"fmt"
 
+	"github.com/rytsh/mugo/internal/render/generic"
 	"github.com/tdewolff/minify/v2"
 	"github.com/tdewolff/minify/v2/css"
 	"github.com/tdewolff/minify/v2/html"
@@ -12,6 +13,10 @@ import (
 	"github.com/tdewolff/minify/v2/svg"
 	"github.com/tdewolff/minify/v2/xml"
 )
+
+func init() {
+	generic.CallReg.AddFunction("minify", generic.ReturnWithFn(Minify))
+}
 
 func Minify(mType string, data []byte) ([]byte, error) {
 	buff := new(bytes.Buffer)
