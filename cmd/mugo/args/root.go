@@ -15,17 +15,17 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/rytsh/liz/loader/file"
+	"github.com/rytsh/liz/utils/fstore"
 	"github.com/rytsh/liz/utils/mapx"
 	"github.com/rytsh/liz/utils/templatex"
 	"github.com/rytsh/liz/utils/templatex/store"
 	"github.com/spf13/cobra"
 	"github.com/worldline-go/logz"
 
+	"github.com/rytsh/liz/utils/shutdown"
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
-	"github.com/rytsh/mugo/internal/render"
 	"github.com/rytsh/mugo/internal/request"
-	"github.com/rytsh/mugo/internal/shutdown"
 )
 
 type AppInfo struct {
@@ -66,7 +66,12 @@ var rootCmd = &cobra.Command{
 
 		if config.App.List {
 			log.Info().Msg("print function list")
-			tpl := templatex.New(store.WithAddFuncsTpl(render.FuncMap(config.App.Trust, config.Checked.WorkDir)))
+			tpl := templatex.New(store.WithAddFuncsTpl(
+				fstore.FuncMapTpl(
+					fstore.WithTrust(config.App.Trust),
+					fstore.WithWorkDir(config.Checked.WorkDir),
+				),
+			))
 			tpl.ListFunctions()
 
 			return nil
@@ -188,11 +193,18 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 			}
 		case <-ctx.Done():
 		}
+
+		shutdown.Global.Run()
 	}()
 
 	httpReq := request.New()
 
-	tpl := templatex.New(store.WithAddFuncsTpl(render.FuncMap(config.App.Trust, config.Checked.WorkDir))).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
+	tpl := templatex.New(store.WithAddFuncsTpl(
+		fstore.FuncMapTpl(
+			fstore.WithTrust(config.App.Trust),
+			fstore.WithWorkDir(config.Checked.WorkDir),
+		),
+	)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
 	for _, p := range config.App.Parse {
 		// if p is an http url, we try to download it
 		if _, err := url.ParseRequestURI(p); err == nil {
