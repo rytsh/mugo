@@ -42,6 +42,14 @@ Flags:
   -w, --work-dir string     work directory for run template
 ```
 
+## Example
+
+Read all folder and generate info json seperately:
+
+```sh
+mugo -t -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." https://github.com/rytsh/mugo/raw/main/templates/folderInfo.tpl
+```
+
 ### Development
 
 <details><summary>Build</summary>
