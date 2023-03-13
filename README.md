@@ -47,7 +47,7 @@ Flags:
 Read all folder and generate info json seperately:
 
 ```sh
-mugo -t -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." https://github.com/rytsh/mugo/raw/main/templates/folderInfo.tpl
+mugo -t -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." https://github.com/rytsh/mugo/raw/main/templates/folderInfo.tpl
 ```
 
 ### Development
