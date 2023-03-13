@@ -1,5 +1,7 @@
 /go.work*
 /*.json
-/dist
+/dist/
 /.golangci.yml
 /output/
+/bin/
+/.vscode/

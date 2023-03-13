@@ -8,11 +8,11 @@ LOCAL_BIN_DIR := $(PWD)/bin
 
 ## golangci configuration
 GOLANGCI_CONFIG_URL   := https://raw.githubusercontent.com/worldline-go/guide/main/lint/.golangci.yml
-GOLANGCI_LINT_VERSION := v1.50.0
+GOLANGCI_LINT_VERSION := v1.51.2
 
 .DEFAULT_GOAL := help
 
-.PHONY: build golangci lint run test-data test coverage clean help
+.PHONY: run test-data build copy-bin golangci lint test coverage html html-gen html-wsl clean help
 
 run: ## Run the application
 	go run $(MAIN_FILE)
@@ -23,7 +23,7 @@ test-data: ## Run the application
 build: ## Build the binary file
 	goreleaser build --snapshot --rm-dist --single-target
 
-copy-bin: ## Copy the binary file to the /usr/local/bin directory
+copy-bin: ## Copy the binary file to the ~/bin directory
 	cp ./dist/$(BINARY)_linux_amd64_v1/$(BINARY) ~/bin/$(BINARY)
 
 .golangci.yml:

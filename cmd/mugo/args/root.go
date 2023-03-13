@@ -130,13 +130,17 @@ var rootCmd = &cobra.Command{
 			inputData = body
 		}
 
-		if isFile {
-			workDir, err := filepath.Abs(filepath.Clean(args[0]))
-			if err != nil {
-				return fmt.Errorf("failed to get absolute path: %w", err)
-			}
+		if config.Checked.WorkDir == "" {
+			if isFile {
+				workDir, err := filepath.Abs(filepath.Clean(args[0]))
+				if err != nil {
+					return fmt.Errorf("failed to get absolute path: %w", err)
+				}
 
-			config.Checked.WorkDir = filepath.Dir(workDir)
+				config.Checked.WorkDir = filepath.Dir(workDir)
+			} else {
+				config.Checked.WorkDir = "."
+			}
 		}
 
 		return mugo(ctx, inputData, info)
@@ -164,6 +168,7 @@ func init() {
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
 	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry")
 	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
+	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
 }
 
 func mugo(ctx context.Context, input []byte, info string) (err error) {
@@ -201,6 +206,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 
 	tpl := templatex.New(store.WithAddFuncsTpl(
 		fstore.FuncMapTpl(
+			fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
 			fstore.WithTrust(config.App.Trust),
 			fstore.WithWorkDir(config.Checked.WorkDir),
 		),

@@ -6,7 +6,7 @@ var (
 	}
 	Checked = Check{
 		Delims:  []string{"", ""},
-		WorkDir: ".",
+		WorkDir: "",
 	}
 )
 

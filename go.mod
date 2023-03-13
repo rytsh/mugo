@@ -6,12 +6,12 @@ require (
 	github.com/rs/zerolog v1.29.0
 	github.com/rytsh/liz/loader/file v0.2.1
 	github.com/rytsh/liz/loader/httpx v0.1.1
-	github.com/rytsh/liz/utils/fstore v0.1.2
+	github.com/rytsh/liz/utils/fstore v0.1.3
 	github.com/rytsh/liz/utils/mapx v0.1.1
 	github.com/rytsh/liz/utils/shutdown v0.1.0
 	github.com/rytsh/liz/utils/templatex v0.3.0
 	github.com/spf13/cobra v1.6.1
-	github.com/worldline-go/logz v0.3.1
+	github.com/worldline-go/logz v0.3.2
 )
 
 require (

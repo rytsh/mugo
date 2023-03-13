@@ -39,6 +39,7 @@ Flags:
   -s, --silience            silience log
   -t, --trust               trust to execute dangerous functions
   -v, --version             version for mugo
+  -w, --work-dir string     work directory for run template
 ```
 
 ### Development
@@ -58,7 +59,7 @@ make build
 
 ```sh
 go run cmd/mugo/main.go -r "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
-go run cmd/mugo/main.go -t -r "." -p 'testdata/tpl/*.tpl' - < testdata/readSeparateStart.tpl
+go run cmd/mugo/main.go -t -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." - < testdata/readSeparateStart.tpl
 ```
 
 </details>
