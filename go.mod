@@ -1,17 +1,17 @@
 module github.com/rytsh/mugo
 
-go 1.19
+go 1.20
 
 require (
 	github.com/rs/zerolog v1.29.0
-	github.com/rytsh/liz/loader/file v0.2.1
-	github.com/rytsh/liz/loader/httpx v0.1.1
-	github.com/rytsh/liz/utils/fstore v0.1.3
-	github.com/rytsh/liz/utils/mapx v0.1.1
-	github.com/rytsh/liz/utils/shutdown v0.1.0
-	github.com/rytsh/liz/utils/templatex v0.3.0
+	github.com/rytsh/liz/file v0.1.0
+	github.com/rytsh/liz/fstore v0.1.2
+	github.com/rytsh/liz/httpx v0.1.0
+	github.com/rytsh/liz/mapx v0.1.0
+	github.com/rytsh/liz/shutdown v0.1.0
+	github.com/rytsh/liz/templatex v0.1.0
 	github.com/spf13/cobra v1.6.1
-	github.com/worldline-go/logz v0.3.2
+	github.com/worldline-go/logz v0.3.3
 )
 
 require (
@@ -22,6 +22,7 @@ require (
 	github.com/cli/safeexec v1.0.1 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/gomarkdown/markdown v0.0.0-20221013030248-663e2500819c // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
 	github.com/google/uuid v1.3.0 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-retryablehttp v0.7.2 // indirect
@@ -29,12 +30,12 @@ require (
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
+	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
 	github.com/mattn/go-isatty v0.0.16 // indirect
 	github.com/mitchellh/copystructure v1.0.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.0 // indirect
-	github.com/rogpeppe/go-internal v1.9.0 // indirect
-	github.com/rytsh/call v0.2.0 // indirect
+	github.com/rytsh/call v0.2.1 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/spf13/afero v1.9.4 // indirect
 	github.com/spf13/cast v1.5.0 // indirect

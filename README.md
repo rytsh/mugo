@@ -23,6 +23,7 @@ Examples:
 mugo -d @data.yaml template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl
+mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"
 
 Flags:
   -d, --data stringArray    input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension

@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog/log"
-	"github.com/rytsh/liz/loader/httpx"
+	"github.com/rytsh/liz/httpx"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/worldline-go/logz"
 )

@@ -14,15 +14,15 @@ import (
 	"syscall"
 
 	"github.com/rs/zerolog/log"
-	"github.com/rytsh/liz/loader/file"
-	"github.com/rytsh/liz/utils/fstore"
-	"github.com/rytsh/liz/utils/mapx"
-	"github.com/rytsh/liz/utils/templatex"
-	"github.com/rytsh/liz/utils/templatex/store"
+	"github.com/rytsh/liz/file"
+	"github.com/rytsh/liz/fstore"
+	"github.com/rytsh/liz/mapx"
+	"github.com/rytsh/liz/templatex"
+	"github.com/rytsh/liz/templatex/store"
 	"github.com/spf13/cobra"
 	"github.com/worldline-go/logz"
 
-	"github.com/rytsh/liz/utils/shutdown"
+	"github.com/rytsh/liz/shutdown"
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
@@ -60,7 +60,8 @@ var rootCmd = &cobra.Command{
 
 	Example: "mugo -d @data.yaml template.tpl" + "\n" +
 		`mugo -d '{"Name": "mugo"}' -o output.txt template.tpl` + "\n" +
-		`mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl`,
+		`mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl` + "\n" +
+		`mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 
