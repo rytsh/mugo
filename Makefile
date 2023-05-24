@@ -8,7 +8,7 @@ LOCAL_BIN_DIR := $(PWD)/bin
 
 ## golangci configuration
 GOLANGCI_CONFIG_URL   := https://raw.githubusercontent.com/worldline-go/guide/main/lint/.golangci.yml
-GOLANGCI_LINT_VERSION := v1.51.2
+GOLANGCI_LINT_VERSION := v1.52.2
 
 .DEFAULT_GOAL := help
 
@@ -18,7 +18,7 @@ run: ## Run the application
 	go run $(MAIN_FILE)
 
 test-data: ## Run the application
-	go run $(MAIN_FILE) -d @testdata/input.toml -p 'testdata/**/*.tpl' testdata/test.json
+	go run $(MAIN_FILE) -d @testdata/data/input.yaml testdata/test.tpl
 
 build: ## Build the binary file
 	goreleaser build --snapshot --rm-dist --single-target

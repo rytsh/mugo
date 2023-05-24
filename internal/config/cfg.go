@@ -23,6 +23,9 @@ type Config struct {
 	Trust        bool
 	SkipVerify   bool
 	DisableRetry bool
+
+	FolderPerm string
+	FilePerm   string
 }
 
 type Check struct {

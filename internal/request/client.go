@@ -3,13 +3,13 @@ package request
 import (
 	"context"
 	"fmt"
+	"io"
 	"net/http"
 	"sync"
 
 	"github.com/rs/zerolog/log"
-	"github.com/rytsh/liz/httpx"
 	"github.com/rytsh/mugo/internal/config"
-	"github.com/worldline-go/logz"
+	"github.com/worldline-go/utility/httpx"
 )
 
 var (
@@ -19,11 +19,15 @@ var (
 
 func New() *Request {
 	once.Do(func() {
+		client, _ := httpx.NewClient(
+			httpx.WithInsecureSkipVerify(config.App.SkipVerify),
+			httpx.WithZerologLogger(log.With().Str("source", "http").Logger()),
+			httpx.WithDisableRetry(config.App.DisableRetry),
+			httpx.WithDisableBaseURLCheck(true),
+		)
 		Client = &Request{
-			client: httpx.New(
-				httpx.WithSkipVerify(config.App.SkipVerify),
-				httpx.WithLog(logz.AdapterKV{Log: log.With().Str("source", "http").Logger()}),
-			)}
+			client: client,
+		}
 	})
 
 	return Client
@@ -34,20 +38,29 @@ type Request struct {
 }
 
 func (r *Request) Get(ctx context.Context, url string) ([]byte, error) {
-	response, err := r.client.Send(
+	var response []byte
+	if err := r.client.RequestWithURL(
 		ctx,
-		url,
 		http.MethodGet,
+		url,
 		nil, nil,
-		&httpx.Retry{DisableRetry: config.App.DisableRetry},
-	)
-	if err != nil {
+		func(r *http.Response) error {
+			if r.StatusCode < 200 || r.StatusCode >= 300 {
+				return fmt.Errorf("failed to download url %s: %s", url, r.Status)
+			}
+
+			body, err := io.ReadAll(r.Body)
+			if err != nil {
+				return fmt.Errorf("failed to read response body: %w", err)
+			}
+
+			response = body
+
+			return nil
+		},
+	); err != nil {
 		return nil, fmt.Errorf("failed to download url %s: %w", url, err)
 	}
 
-	if response.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("failed to get: %d", response.StatusCode)
-	}
-
-	return response.Body, nil
+	return response, nil
 }

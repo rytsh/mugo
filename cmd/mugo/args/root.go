@@ -170,6 +170,9 @@ func init() {
 	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry")
 	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
 	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
+	rootCmd.Flags().StringVar(&config.App.FolderPerm, "perm-folder", config.App.FolderPerm, "create folder permission, default is 0755")
+	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")
+
 }
 
 func mugo(ctx context.Context, input []byte, info string) (err error) {
@@ -212,6 +215,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 			fstore.WithWorkDir(config.Checked.WorkDir),
 		),
 	)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
+
 	for _, p := range config.App.Parse {
 		// if p is an http url, we try to download it
 		if _, err := url.ParseRequestURI(p); err == nil {
@@ -232,9 +236,15 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		}
 	}
 
+	fileAPI := file.New()
 	output := os.Stdout
+
 	if config.App.Output != "" {
-		output, err = os.OpenFile(config.App.Output, os.O_CREATE|os.O_TRUNC|os.O_WRONLY, 0644)
+		output, err = fileAPI.OpenFile(
+			config.App.Output,
+			file.WithFolderPerm(config.App.FolderPerm),
+			file.WithFilePerm(config.App.FilePerm),
+		)
 		if err != nil {
 			return err
 		}
@@ -245,7 +255,6 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	// read input data
 	var inputData interface{}
 
-	fileAPI := file.New()
 	if config.App.DataRaw != "" {
 		if !config.App.DisableAt && config.App.DataRaw[0] == '@' {
 			if d, err := fileAPI.LoadRaw(config.App.DataRaw[1:]); err != nil {
@@ -257,9 +266,9 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 			inputData = config.App.DataRaw
 		}
 	} else {
-		storeData := make(map[string]interface{})
+		var storeData interface{}
 		for _, data := range config.App.Data {
-			var currentData map[string]interface{}
+			var currentData interface{}
 			var err error
 
 			if !config.App.DisableAt && data[0] == '@' {
@@ -272,7 +281,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 				return fmt.Errorf("failed to load input data: %w", err)
 			}
 
-			mapx.Merge(currentData, storeData)
+			storeData = mapx.MergeAny(currentData, storeData)
 		}
 
 		inputData = storeData
@@ -295,7 +304,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 
 	log.Info().Msg("render completed")
 
-	return
+	return nil
 }
 
 func ReadAll(r io.Reader) (string, error) {

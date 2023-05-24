@@ -3,15 +3,15 @@ module github.com/rytsh/mugo
 go 1.20
 
 require (
-	github.com/rs/zerolog v1.29.0
-	github.com/rytsh/liz/file v0.1.0
-	github.com/rytsh/liz/fstore v0.1.2
-	github.com/rytsh/liz/httpx v0.1.0
-	github.com/rytsh/liz/mapx v0.1.0
+	github.com/rs/zerolog v1.29.1
+	github.com/rytsh/liz/file v0.1.3
+	github.com/rytsh/liz/fstore v0.1.3
+	github.com/rytsh/liz/mapx v0.1.1
 	github.com/rytsh/liz/shutdown v0.1.0
 	github.com/rytsh/liz/templatex v0.1.0
 	github.com/spf13/cobra v1.6.1
 	github.com/worldline-go/logz v0.3.3
+	github.com/worldline-go/utility/httpx v0.2.3
 )
 
 require (
@@ -29,6 +29,7 @@ require (
 	github.com/huandu/xstrings v1.3.3 // indirect
 	github.com/imdario/mergo v0.3.11 // indirect
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/jaswdr/faker v1.17.0 // indirect
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51 // indirect
 	github.com/kr/pretty v0.3.1 // indirect
 	github.com/mattn/go-colorable v0.1.12 // indirect
@@ -42,8 +43,9 @@ require (
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tdewolff/minify/v2 v2.12.4 // indirect
 	github.com/tdewolff/parse/v2 v2.6.4 // indirect
+	github.com/worldline-go/utility/contextx v0.1.0 // indirect
 	golang.org/x/crypto v0.3.0 // indirect
-	golang.org/x/sys v0.2.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
 	golang.org/x/text v0.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
