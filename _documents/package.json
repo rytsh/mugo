@@ -1,0 +1,18 @@
+{
+  "name": "mugo-documents",
+  "private": true,
+  "description": "mugo template rendering documents",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "template"
+  ],
+  "author": "eates23@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "vitepress": "1.0.0-beta.1"
+  }
+}

@@ -15,17 +15,17 @@ import (
 
 	"github.com/rs/zerolog/log"
 	"github.com/rytsh/liz/file"
-	"github.com/rytsh/liz/fstore"
 	"github.com/rytsh/liz/mapx"
-	"github.com/rytsh/liz/templatex"
-	"github.com/rytsh/liz/templatex/store"
+	"github.com/rytsh/liz/shutdown"
 	"github.com/spf13/cobra"
 	"github.com/worldline-go/logz"
 
-	"github.com/rytsh/liz/shutdown"
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
+	"github.com/rytsh/mugo/pkg/fstore"
+	"github.com/rytsh/mugo/pkg/templatex"
+	"github.com/rytsh/mugo/pkg/templatex/store"
 )
 
 type AppInfo struct {
@@ -73,7 +73,10 @@ var rootCmd = &cobra.Command{
 					fstore.WithWorkDir(config.Checked.WorkDir),
 				),
 			))
-			tpl.ListFunctions()
+
+			for _, v := range tpl.ListFuncs() {
+				fmt.Println(v.Description)
+			}
 
 			return nil
 		}
