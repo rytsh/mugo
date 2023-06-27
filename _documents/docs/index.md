@@ -15,7 +15,7 @@ hero:
       link: /functions.md
 
 features:
-  - title: TUI / CLI
+  - title: CLI
     details: Powerful CLI to easily execute templates
   - title: Multiple Functions
     details: A lot of functions to help you build your templates

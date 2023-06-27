@@ -13,6 +13,6 @@
   "author": "eates23@gmail.com",
   "license": "MIT",
   "devDependencies": {
-    "vitepress": "1.0.0-beta.1"
+    "vitepress": "1.0.0-beta.3"
   }
 }

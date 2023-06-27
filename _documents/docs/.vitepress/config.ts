@@ -4,6 +4,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "mugo",
   description: "documentation",
+  base: "/mugo/",
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
