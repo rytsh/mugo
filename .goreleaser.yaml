@@ -10,7 +10,8 @@ release:
     # brew tap brew-tools/tap
     brew install mugo
     # or binary download
-    curl -fsSL https://github.com/rytsh/mugo/releases/latest/download/mugo_Linux_x86_64.tar.gz | sudo tar -xz --overwrite -C /usr/local/bin/
+    # curl -fsSL https://github.com/rytsh/mugo/releases/latest/download/mugo_Linux_x86_64.tar.gz | tar -xz --overwrite -C ~/bin/ mugo
+    curl https://github.com/rytsh/mugo/releases/download/{{ .Tag }}/mugo_Linux_x86_64.tar.gz | tar -xz --overwrite -C ~/bin/ mugo
     ```
   footer: |
     **Full Changelog**: https://github.com/rytsh/mugo/compare/{{ .PreviousTag }}...{{ .Tag }}
@@ -35,13 +36,12 @@ builds:
     flags:
       - -trimpath
 archives:
-  - replacements:
-      darwin: Darwin
-      linux: Linux
-      windows: Windows
-      386: i386
-      amd64: x86_64
-    name_template: '{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}'
+  - name_template: >-
+      {{ .ProjectName }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
     format_overrides:
       - goos: windows
         format: zip
