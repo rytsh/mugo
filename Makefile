@@ -17,6 +17,9 @@ GOLANGCI_LINT_VERSION := v1.52.2
 run: ## Run the application
 	go run $(MAIN_FILE)
 
+docs-view: ## Docs dev
+	cd _documents && pnpm run docs:dev
+
 test-data: ## Run the application
 	go run $(MAIN_FILE) -d @testdata/data/input.yaml testdata/test.tpl
 

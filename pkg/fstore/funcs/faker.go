@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("faker", new(Faker).init)
+	registry.AddGroup("faker", new(Faker).init)
 }
 
 type Faker struct {

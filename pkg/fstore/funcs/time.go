@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("time", registry.ReturnWithFn(Time{}))
+	registry.AddGroup("time", registry.ReturnWithFn(Time{}))
 }
 
 type Time struct{}

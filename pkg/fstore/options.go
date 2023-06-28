@@ -1,7 +1,7 @@
 package fstore
 
 import (
-	"github.com/rytsh/mugo/pkg/fstore/funcs"
+	"github.com/rytsh/mugo/pkg/fstore/registry"
 	"github.com/worldline-go/logz"
 )
 
@@ -14,7 +14,7 @@ type options struct {
 	trust           bool
 	log             logz.Adapter
 	workDir         string
-	executeTemplate funcs.ExecuteTemplate
+	executeTemplate registry.ExecuteTemplate
 }
 
 type Option func(options *options)
@@ -56,7 +56,7 @@ func WithDisableGroups(disableGroups ...string) Option {
 func WithDisableFuncs(disableFuncs ...string) Option {
 	return func(options *options) {
 		for _, f := range disableFuncs {
-			options.disableGroups[f] = struct{}{}
+			options.disableFuncs[f] = struct{}{}
 		}
 	}
 }
@@ -76,7 +76,7 @@ func WithWorkDir(workDir string) Option {
 	}
 }
 
-func WithExecuteTemplate(t funcs.ExecuteTemplate) Option {
+func WithExecuteTemplate(t registry.ExecuteTemplate) Option {
 	return func(options *options) {
 		options.executeTemplate = t
 	}

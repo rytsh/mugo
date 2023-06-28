@@ -64,3 +64,25 @@ func Example_simple() {
 	// Output:
 	//
 }
+
+func Example_execTemplate() {
+	tpl := template.New("test")
+	tpl.Funcs(fstore.FuncMap(
+		fstore.WithSpecificFuncs("execTemplate"),
+		fstore.WithExecuteTemplate(tpl),
+	))
+
+	output := &bytes.Buffer{}
+	tplParsed, err := tpl.Parse(`{{ define "ochtend" }}Dag!{{ end }}{{ execTemplate "ochtend" nil | printf }}`)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if err := tplParsed.Execute(output, nil); err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Printf("%s", output)
+	// Output:
+	// Dag!
+}

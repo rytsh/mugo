@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("file", new(File).init, "trust")
+	registry.AddGroup("file", new(File).init, "trust")
 }
 
 type File struct {

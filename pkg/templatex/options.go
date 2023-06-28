@@ -10,26 +10,26 @@ type options struct {
 	parsed   bool
 }
 
-// Option to execute the template.
-type Option func(options *options)
+// OptionExecute to execute the template.
+type OptionExecute func(options *options)
 
 // WithIO sets the writer to use.
 // Useful for Execute function.
-func WithIO(w io.Writer) Option {
+func WithIO(w io.Writer) OptionExecute {
 	return func(options *options) {
 		options.writer = w
 	}
 }
 
 // WithContent sets the content to parse, if WithParsed used this option is ignored.
-func WithContent(content string) Option {
+func WithContent(content string) OptionExecute {
 	return func(options *options) {
 		options.content = content
 	}
 }
 
 // WithTemplate sets the specific template to execute.
-func WithTemplate(template string) Option {
+func WithTemplate(template string) OptionExecute {
 	return func(options *options) {
 		options.template = template
 	}
@@ -37,14 +37,14 @@ func WithTemplate(template string) Option {
 
 // WithData sets the data to use in Execute* functions.
 // This is the values passed to the template.
-func WithData(values any) Option {
+func WithData(values any) OptionExecute {
 	return func(options *options) {
 		options.data = values
 	}
 }
 
 // WithParsed sets the parsed template to use in Execute* functions.
-func WithParsed(parsed bool) Option {
+func WithParsed(parsed bool) OptionExecute {
 	return func(options *options) {
 		options.parsed = parsed
 	}

@@ -11,10 +11,10 @@ type Info struct {
 	Usage string
 }
 
-func FuncInfos(fns map[string]interface{}) []Info {
+func (t *Template) FuncInfos() []Info {
 	var infos []Info
 
-	for name, fn := range fns {
+	for name, fn := range t.funcs {
 		// get function signature with reflect as string
 		reflectFn := reflect.ValueOf(fn)
 		reflectFnType := reflectFn.Type()

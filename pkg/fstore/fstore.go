@@ -1,7 +1,7 @@
 package fstore
 
 import (
-	"github.com/rytsh/mugo/pkg/fstore/funcs"
+	_ "github.com/rytsh/mugo/pkg/fstore/funcs"
 	"github.com/rytsh/mugo/pkg/fstore/registry"
 )
 
@@ -11,7 +11,7 @@ func FuncMap(opts ...Option) map[string]interface{} {
 	return funcX(opt)(opt.executeTemplate)
 }
 
-func FuncMapTpl(opts ...Option) func(t funcs.ExecuteTemplate) map[string]interface{} {
+func FuncMapTpl(opts ...Option) func(t registry.ExecuteTemplate) map[string]interface{} {
 	return funcX(optionRun(opts...))
 }
 
@@ -29,8 +29,8 @@ func optionRun(opts ...Option) options {
 	return opt
 }
 
-func funcX(o options) func(t funcs.ExecuteTemplate) map[string]interface{} {
-	return func(t funcs.ExecuteTemplate) map[string]interface{} {
+func funcX(o options) func(t registry.ExecuteTemplate) map[string]interface{} {
+	return func(t registry.ExecuteTemplate) map[string]interface{} {
 		v := make(map[string]interface{})
 
 		// custom functions
@@ -40,39 +40,27 @@ func funcX(o options) func(t funcs.ExecuteTemplate) map[string]interface{} {
 			AddArgument("template", t).
 			AddArgument("workDir", o.workDir)
 
-		for gName, mapValues := range registry.DirectReg {
-			if _, ok := o.disableGroups[gName]; ok {
+		for _, fName := range registry.CallReg.GetFunctionNames() {
+			// fname is a group and not a specific group
+			if registry.IsGroup(fName) && !isSpecificGroup(o, fName) {
 				continue
 			}
 
-			if !isSpecificGroup(o, gName) {
-				continue
-			}
+			switch vTyped := registry.GetFunc(fName).(type) {
+			case map[string]interface{}:
+				for key, value := range vTyped {
+					if !isSpecificFunc(o, key) {
+						continue
+					}
 
-			for fName, fValue := range mapValues {
-				if _, ok := o.disableFuncs[fName]; ok {
-					continue
+					v[key] = value
 				}
-
+			default:
 				if !isSpecificFunc(o, fName) {
 					continue
 				}
 
-				v[fName] = fValue
-			}
-		}
-
-		if len(o.specificGroups) == 0 {
-			for _, fName := range registry.CallReg.GetFunctionNames() {
-				if _, ok := o.disableFuncs[fName]; ok {
-					continue
-				}
-
-				if !isSpecificFunc(o, fName) {
-					continue
-				}
-
-				v[fName] = registry.GetFunc(fName)
+				v[fName] = vTyped
 			}
 		}
 
@@ -81,6 +69,10 @@ func funcX(o options) func(t funcs.ExecuteTemplate) map[string]interface{} {
 }
 
 func isSpecificFunc(o options, name string) bool {
+	if _, ok := o.disableFuncs[name]; ok {
+		return false
+	}
+
 	if len(o.specificFunc) > 0 {
 		if _, ok := o.specificFunc[name]; ok {
 			return true
@@ -93,6 +85,10 @@ func isSpecificFunc(o options, name string) bool {
 }
 
 func isSpecificGroup(o options, name string) bool {
+	if _, ok := o.disableGroups[name]; ok {
+		return false
+	}
+
 	if len(o.specificGroups) > 0 {
 		if _, ok := o.specificGroups[name]; ok {
 			return true

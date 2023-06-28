@@ -14,7 +14,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("exec", new(Exec).init, "trust", "log")
+	registry.AddFunction("exec", new(Exec).init, "trust", "log")
 }
 
 type Exec struct {

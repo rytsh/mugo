@@ -1,6 +1,7 @@
 package templatex_test
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 
@@ -18,18 +19,19 @@ func Example() {
 		return a - b
 	})
 
-	output, err := tpl.ExecuteBuffer(
+	var output bytes.Buffer
+	if err := tpl.Execute(
+		templatex.WithIO(&output),
 		templatex.WithData(map[string]interface{}{
 			"a": 1,
 			"b": 2,
 		}),
 		templatex.WithContent(`a + b = {{ add .a .b }}`+"\n"+`a - b = {{ sub .a .b }}`),
-	)
-	if err != nil {
+	); err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%s", output)
+	fmt.Printf("%s", output.String())
 	// Output:
 	// a + b = 3
 	// a - b = -1

@@ -18,7 +18,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("crypto", registry.ReturnWithFn(Crypto{}))
+	registry.AddGroup("crypto", registry.ReturnWithFn(Crypto{}))
 }
 
 type Crypto struct{}

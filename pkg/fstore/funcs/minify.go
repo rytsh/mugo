@@ -16,7 +16,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("minify", new(Minify).init)
+	registry.AddFunction("minify", new(Minify).init)
 }
 
 type Minify struct {

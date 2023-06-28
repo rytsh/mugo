@@ -8,5 +8,5 @@ import (
 )
 
 func init() {
-	registry.DirectReg.Add("sprig", sprig.GenericFuncMap())
+	registry.AddGroup("sprig", sprig.GenericFuncMap)
 }

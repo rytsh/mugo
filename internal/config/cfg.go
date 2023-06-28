@@ -18,7 +18,6 @@ type Config struct {
 	Delims       string
 	Output       string
 	Silience     bool
-	List         bool
 	DisableAt    bool
 	Trust        bool
 	SkipVerify   bool
@@ -26,6 +25,14 @@ type Config struct {
 
 	FolderPerm string
 	FilePerm   string
+
+	List           bool
+	SpecificGroups []string
+	SpecificFuncs  []string
+	DisabledGroups []string
+	DisabledFuncs  []string
+
+	HtmlTemplate bool
 }
 
 type Check struct {

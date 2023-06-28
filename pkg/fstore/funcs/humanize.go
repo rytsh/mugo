@@ -10,7 +10,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("humanize", registry.ReturnWithFn(Humanize{}))
+	registry.AddGroup("humanize", registry.ReturnWithFn(Humanize{}))
 }
 
 // Humanize is a collection of humanize github.com/dustin/go-humanize functions.

@@ -13,7 +13,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("os", new(Os).init, "workDir")
+	registry.AddGroup("os", new(Os).init, "workDir")
 }
 
 type Os struct {

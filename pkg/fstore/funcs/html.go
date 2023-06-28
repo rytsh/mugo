@@ -7,7 +7,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("html", registry.ReturnWithFn(Html{}))
+	registry.AddGroup("html", registry.ReturnWithFn(Html{}))
 }
 
 type Html struct{}

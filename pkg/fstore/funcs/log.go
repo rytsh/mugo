@@ -7,9 +7,8 @@ import (
 )
 
 func init() {
-	registry.CallReg.
-		AddFunction("log", registry.ReturnWithFn(Log{})).
-		AddFunction("nothing", registry.ReturnWithFn(Nothing))
+	registry.AddGroup("log", registry.ReturnWithFn(Log{}))
+	registry.AddFunction("nothing", registry.ReturnWithFn(Nothing))
 }
 
 type Log struct{}

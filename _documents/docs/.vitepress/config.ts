@@ -20,7 +20,6 @@ export default defineConfig({
           { text: 'Getting Started', link: '/introduction/getting-started.md' },
           { text: 'Go Module', link: '/introduction/go-module.md' },
           { text: 'Command Line Interface', link: '/introduction/cli.md' },
-          { text: 'Terminal UI', link: '/introduction/tui.md' },
         ]
       },
       {

@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("codec", registry.ReturnWithFn(Codec{}))
+	registry.AddGroup("codec", registry.ReturnWithFn(Codec{}))
 }
 
 type Codec struct{}

@@ -1,9 +1,8 @@
 package templatex
 
 import (
+	"bytes"
 	"testing"
-
-	"github.com/rytsh/mugo/pkg/templatex/store"
 )
 
 func TestTemplate_Execute(t *testing.T) {
@@ -14,7 +13,7 @@ func TestTemplate_Execute(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		opts    []store.Option
+		opts    []OptionTemplate
 		want    string
 		wantErr bool
 	}{
@@ -33,7 +32,7 @@ func TestTemplate_Execute(t *testing.T) {
 				v:       map[string]interface{}{"name": "x"},
 				content: `{{ custom .name }}`,
 			},
-			opts: []store.Option{store.WithAddFunc("custom", func(x string) string {
+			opts: []OptionTemplate{WithAddFunc("custom", func(x string) string {
 				return x + "custom"
 			})},
 			want:    "xcustom",
@@ -45,13 +44,14 @@ func TestTemplate_Execute(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			templateEngine := New(tt.opts...)
 
-			got, err := templateEngine.ExecuteBuffer(WithData(tt.args.v), WithContent(tt.args.content))
+			var buf bytes.Buffer
+			err := templateEngine.Execute(WithIO(&buf), WithData(tt.args.v), WithContent(tt.args.content))
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Template.Execute() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			if string(got) != tt.want {
-				t.Errorf("Template.Execute() = %s, want %s", got, tt.want)
+			if buf.String() != tt.want {
+				t.Errorf("Template.Execute() = %s, want %s", buf.String(), tt.want)
 			}
 		})
 	}

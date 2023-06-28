@@ -24,8 +24,8 @@ import (
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
 	"github.com/rytsh/mugo/pkg/fstore"
+	"github.com/rytsh/mugo/pkg/fstore/registry"
 	"github.com/rytsh/mugo/pkg/templatex"
-	"github.com/rytsh/mugo/pkg/templatex/store"
 )
 
 type AppInfo struct {
@@ -66,12 +66,10 @@ var rootCmd = &cobra.Command{
 		ctx := cmd.Context()
 
 		if config.App.List {
-			log.Info().Msg("print function list")
-			tpl := templatex.New(store.WithAddFuncsTpl(
-				fstore.FuncMapTpl(
-					fstore.WithTrust(config.App.Trust),
-					fstore.WithWorkDir(config.Checked.WorkDir),
-				),
+			log.Info().Msgf("print function list")
+
+			tpl := templatex.New(templatex.WithAddFuncsTpl(
+				FStore(),
 			))
 
 			for _, v := range tpl.ListFuncs() {
@@ -160,6 +158,7 @@ func Execute(ctx context.Context, appInfo AppInfo) error {
 }
 
 func init() {
+	rootCmd.Flags().BoolVar(&config.App.HtmlTemplate, "html", config.App.HtmlTemplate, "use html/template instead")
 	rootCmd.Flags().StringVar(&config.App.Delims, "delims", config.App.Delims, "comma or space separated list of delimiters to alternate the default \"{{ }}\"")
 	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension")
 	rootCmd.Flags().StringVarP(&config.App.DataRaw, "data-raw", "r", config.App.DataRaw, "input data as raw or file path with @ prefix could be file with any extension")
@@ -167,6 +166,10 @@ func init() {
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
 	rootCmd.Flags().BoolVarP(&config.App.Silience, "silience", "s", config.App.Silience, "silience log")
 	rootCmd.Flags().BoolVarP(&config.App.List, "list", "l", config.App.List, "function list")
+	rootCmd.Flags().StringArrayVar(&config.App.SpecificGroups, "enable-group", config.App.SpecificGroups, "specific function groups for run template")
+	rootCmd.Flags().StringArrayVar(&config.App.SpecificFuncs, "enable-func", config.App.SpecificFuncs, "specific functions for run template")
+	rootCmd.Flags().StringArrayVar(&config.App.DisabledGroups, "disable-group", config.App.DisabledGroups, "disabled groups for run template")
+	rootCmd.Flags().StringArrayVar(&config.App.DisabledFuncs, "disable-func", config.App.DisabledFuncs, "disabled functions for run template")
 	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.DisableAt, "disable @ prefix for file path")
 	rootCmd.Flags().BoolVarP(&config.App.Trust, "trust", "t", config.App.Trust, "trust to execute dangerous functions")
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
@@ -175,7 +178,6 @@ func init() {
 	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
 	rootCmd.Flags().StringVar(&config.App.FolderPerm, "perm-folder", config.App.FolderPerm, "create folder permission, default is 0755")
 	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")
-
 }
 
 func mugo(ctx context.Context, input []byte, info string) (err error) {
@@ -211,12 +213,8 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 
 	httpReq := request.New()
 
-	tpl := templatex.New(store.WithAddFuncsTpl(
-		fstore.FuncMapTpl(
-			fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
-			fstore.WithTrust(config.App.Trust),
-			fstore.WithWorkDir(config.Checked.WorkDir),
-		),
+	tpl := templatex.New(templatex.WithAddFuncsTpl(
+		FStore(),
 	)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
 
 	for _, p := range config.App.Parse {
@@ -317,4 +315,17 @@ func ReadAll(r io.Reader) (string, error) {
 	}
 
 	return string(content), nil
+}
+
+func FStore() func(t registry.ExecuteTemplate) map[string]interface{} {
+	return fstore.FuncMapTpl(
+		fstore.WithSpecificGroups(config.App.SpecificGroups...),
+		fstore.WithSpecificFuncs(config.App.SpecificFuncs...),
+		fstore.WithDisableGroups(config.App.DisabledGroups...),
+		fstore.WithDisableFuncs(config.App.DisabledFuncs...),
+
+		fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+		fstore.WithTrust(config.App.Trust),
+		fstore.WithWorkDir(config.Checked.WorkDir),
+	)
 }

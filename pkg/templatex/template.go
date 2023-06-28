@@ -3,32 +3,50 @@ package templatex
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"sort"
-	textTemplate "text/template"
-
-	"github.com/rytsh/mugo/pkg/templatex/store"
+	"sync"
 )
 
+var DefaultTemplateName = "_templatex"
+
 type Template struct {
-	template       *textTemplate.Template
-	templateParsed *textTemplate.Template
-	funcs          map[string]interface{}
+	template       templateInf
+	templateParsed templateInf
+
+	mutex sync.RWMutex
+	funcs map[string]interface{}
+
+	isHtmlTemplate bool
 }
 
 // New returns a new Template.
-func New(opts ...store.Option) *Template {
-	tpl := &Template{
-		template: textTemplate.New("txt"),
+func New(opts ...OptionTemplate) *Template {
+	tpl := &Template{}
+
+	optsNew := make([]OptionTemplate, 0, len(opts)+1)
+	optsNew = append(optsNew, WithFnValue(tpl))
+	optsNew = append(optsNew, opts...)
+
+	option := &optionsTemplate{}
+	for _, opt := range optsNew {
+		opt(option)
 	}
 
-	tpl.setFunctions(opts...)
+	tpl.isHtmlTemplate = option.isHtmlTemplate
+	tpl.template = newTemplateX(DefaultTemplateName, tpl.isHtmlTemplate)
+	tpl.funcs = make(map[string]interface{}, len(option.addFuncs))
+
+	tpl.AddFuncMap(
+		option.addFuncs,
+	)
 
 	return tpl
 }
 
 // ListFuncs returns the list of functions with name order.
 func (t *Template) ListFuncs() []Info {
-	funcs := FuncInfos(t.funcs)
+	funcs := t.FuncInfos()
 	sort.Slice(funcs, func(i, j int) bool {
 		return funcs[i].Name < funcs[j].Name
 	})
@@ -36,9 +54,34 @@ func (t *Template) ListFuncs() []Info {
 	return funcs
 }
 
-// Reset the template.
+// SetTypeHtml converts the template to html template.
+//
+// This function will reset the template when switching from text to html template.
+func (t *Template) SetTypeHtml() {
+	if !t.isHtmlTemplate {
+		t.isHtmlTemplate = true
+		t.Reset()
+	}
+}
+
+// SetTypeText converts the template to text template.
+//
+// This function will reset the template when switching from html to text template.
+func (t *Template) SetTypeText() {
+	if t.isHtmlTemplate {
+		t.isHtmlTemplate = false
+		t.Reset()
+	}
+}
+
+// Reset the template and add the functions back.
 func (t *Template) Reset() {
-	t.template = textTemplate.New("txt")
+	t.template = newTemplateX(DefaultTemplateName, t.isHtmlTemplate)
+	t.templateParsed = nil
+
+	t.AddFuncMap(
+		t.funcs,
+	)
 }
 
 // SetDelims sets the template delimiters to the specified strings
@@ -57,17 +100,11 @@ func (t *Template) SetDelims(left, right string) *Template {
 	return t
 }
 
-func (t *Template) setFunctions(opts ...store.Option) {
-	optsNew := make([]store.Option, 0, len(opts)+1)
-	optsNew = append(optsNew, store.WithFnValue(t))
-	optsNew = append(optsNew, opts...)
-
-	t.funcs = store.New(optsNew...).Funcs()
-	t.template.Funcs(t.funcs)
-}
-
 // AddFuncMap for extra textTemplate functions.
-func (t *Template) AddFuncMap(funcMap textTemplate.FuncMap) {
+func (t *Template) AddFuncMap(funcMap map[string]any) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	for k, v := range funcMap {
 		t.funcs[k] = v
 	}
@@ -77,9 +114,12 @@ func (t *Template) AddFuncMap(funcMap textTemplate.FuncMap) {
 
 // AddFunc for adding a func to the template.
 func (t *Template) AddFunc(name string, fn interface{}) {
+	t.mutex.Lock()
+	defer t.mutex.Unlock()
+
 	t.funcs[name] = fn
 
-	t.template.Funcs(textTemplate.FuncMap{name: fn})
+	t.template.Funcs(map[string]any{name: fn})
 }
 
 // ParseGlob parses the template definitions in the files identified by the pattern.
@@ -118,7 +158,16 @@ func (t *Template) Parse(content string) error {
 
 // Execute the template and write the output to the buffer.
 // Add WithIO to change the writer.
-func (t *Template) Execute(opts ...Option) error {
+//
+// Example to execute a template with data and use parsed template:
+//
+//	t.Execute(WithTemplate(templateName), WithData(data), WithParsed(true))
+//
+// Example to execute and return the result:
+//
+//	var buf bytes.Buffer
+//	t.Execute(WithIO(&buf), WithData(data))
+func (t *Template) Execute(opts ...OptionExecute) error {
 	o := &options{
 		writer: &bytes.Buffer{},
 	}
@@ -126,38 +175,6 @@ func (t *Template) Execute(opts ...Option) error {
 		opt(o)
 	}
 
-	err := t.execute(o)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// ExecuteBuffer the template and return the output.
-func (t *Template) ExecuteBuffer(opts ...Option) ([]byte, error) {
-	output := &bytes.Buffer{}
-	o := &options{}
-	for _, opt := range opts {
-		opt(o)
-	}
-
-	o.writer = output
-
-	err := t.execute(o)
-	if err != nil {
-		return nil, err
-	}
-
-	return output.Bytes(), nil
-}
-
-// ExecuteBuffer the template and return the output.
-func (t *Template) ExecuteTemplate(templateName string, data any) ([]byte, error) {
-	return t.ExecuteBuffer(WithTemplate(templateName), WithData(data), WithParsed(true))
-}
-
-func (t *Template) execute(o *options) error {
 	tpl := t.template
 	if o.parsed && t.templateParsed != nil {
 		tpl = t.templateParsed
@@ -188,4 +205,13 @@ func (t *Template) execute(o *options) error {
 	}
 
 	return nil
+}
+
+func (t *Template) ExecuteTemplate(wr io.Writer, name string, data any) error {
+	return t.Execute(
+		WithTemplate(name),
+		WithData(data),
+		WithIO(wr),
+		WithParsed(true),
+	)
 }

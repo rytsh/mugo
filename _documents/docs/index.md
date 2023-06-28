@@ -12,7 +12,7 @@ hero:
       link: /introduction/getting-started.md
     - theme: alt
       text: Function Reference
-      link: /functions.md
+      link: /functions/reference.md
 
 features:
   - title: CLI

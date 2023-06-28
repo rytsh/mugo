@@ -8,7 +8,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("map", new(Map).init)
+	registry.AddGroup("map", new(Map).init)
 }
 
 type Map struct {

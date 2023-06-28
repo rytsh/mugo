@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	registry.CallReg.AddFunction("cast", registry.ReturnWithFn(Cast{}))
+	registry.AddGroup("cast", registry.ReturnWithFn(Cast{}))
 }
 
 // Cast is a collection of cast github.com/spf13/cast functions.
