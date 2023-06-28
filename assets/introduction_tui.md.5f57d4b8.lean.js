@@ -1,1 +1,0 @@
-import{_ as t,o as e,c as o}from"./chunks/framework.73457c9b.js";const _=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"introduction/tui.md","filePath":"introduction/tui.md"}'),n={name:"introduction/tui.md"};function r(a,i,c,s,d,p){return e(),o("div")}const m=t(n,[["render",r]]);export{_ as __pageData,m as default};
