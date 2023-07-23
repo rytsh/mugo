@@ -11,7 +11,7 @@ import (
 	"github.com/rytsh/mugo/pkg/templatex"
 )
 
-func ExampleTemplatexWithFstore() {
+func Example() {
 	tpl := templatex.New(templatex.WithAddFuncsTpl(
 		fstore.FuncMapTpl(
 			fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
