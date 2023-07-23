@@ -44,7 +44,7 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if config.App.Silience {
-			err := logz.SetLogLevel("fatal")
+			err := logz.SetLogLevel("error")
 			if err != nil {
 				log.Error().Err(err).Msg("failed to set log level")
 			}

@@ -76,15 +76,31 @@ fmt.Printf("%s", output)
 # Use fstore with templatex
 
 `fstore` and `templatex` can be used together.
+Use the tpl to execute templates.
 
 ```go
-tpl := templatex.New(store.WithAddFuncsTpl(
+tpl := templatex.New(templatex.WithAddFuncsTpl(
     fstore.FuncMapTpl(
         fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
-        fstore.WithTrust(config.App.Trust),
-        fstore.WithWorkDir(config.Checked.WorkDir),
+        fstore.WithTrust(true),
+        fstore.WithWorkDir("."),
     ),
 ))
-```
 
-Use the tpl to execute templates.
+var buf bytes.Buffer
+err := tpl.Execute(
+    templatex.WithContent("{{.Count}} items are made of {{.Material}}"),
+    templatex.WithData(map[string]interface{}{
+        "Count":    3,
+        "Material": "wood",
+    }),
+    templatex.WithIO(&buf),
+)
+if err != nil {
+    log.Fatal().Err(err).Msg("failed to execute template")
+}
+
+fmt.Println(buf.String())
+// Output:
+// 3 items are made of wood
+```

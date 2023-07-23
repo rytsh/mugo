@@ -133,23 +133,140 @@ Output: `[1 add]`
 Output: `123`
 
 ### b32dec(string) string
+
+```tpl
+{{ b32dec "MZXW6YTBOI======" }}
+```
+
+Output: `foobar`
+
 ### b32enc(string) string
+
+```tpl
+{{ b32enc "foobar" }}
+```
+
+Output: `MZXW6YTBOI======`
+
 ### b64dec(string) string
+
+```tpl
+{{ b64dec "SGVsbG8gV29ybGQ=" }}
+```
+
+Output: `Hello World`
+
 ### b64enc(string) string
+
+```tpl
+{{ b64enc "Hello World" }}
+```
+
+Output: `SGVsbG8gV29ybGQ=`
+
 ### base(string) string
+
+`path.Base` function.
+
+```tpl
+{{ base "/foo/bar/baz.js" }}
+```
+
+Output: `baz.js`
+
 ### bcrypt(string) string
+
+`golang.org/x/crypto/bcrypt` package's `GenerateFromPassword` function.
+
+```tpl
+{{ bcrypt "Hello World" }}
+```
+
+Output: `$2a$10$dTu/HetKKYglHR1bs9mBFeGkOFgIMAabTdC0TNPh5ucVJLQLTfVYG`
+
 ### biggest(interface {}, []interface {}) int64
+
+```tpl
+{{ biggest 1 2 3 4 5 }}
+```
+
+Output: `5`
+
 ### buildCustomCert(string, string) (sprig.certificate, error)
 ### camelcase(string) string
+
+```tpl
+{{ camelcase "hello_world" }}
+```
+
+Output: `HelloWorld`
+
 ### cat([]interface {}) string
+
+```tpl
+{{ cat "Hello" "World" }}
+```
+
+Output: `Hello World`
+
 ### ceil(interface {}) float64
+
+```tpl
+{{ ceil 1.1 }}
+```
+
+Output: `2`
+
 ### chunk(int, interface {}) [][]interface {}
+
+```tpl
+{{ chunk 2 (list 1 2 3 4 5) }}
+```
+
+Output: `[[1 2] [3 4] [5]]`
+
 ### clean(string) string
+
+`path.Clean` function.
+
+```tpl
+{{ clean "/foo/bar/.." }}
+```
+
+Output: `/foo`
+
 ### coalesce([]interface {}) interface {}
+
+Returns the first non-empty value.
+
+```tpl
+{{ coalesce "" "Hello World" }}
+```
+
+Output: `Hello World`
+
 ### compact(interface {}) []interface {}
 ### concat([]interface {}) interface {}
 ### contains(string, string) bool
+
+`strings.Contains` function but arguments are reversed.
+
+```tpl
+{{ contains "World" "Hello World" }}
+```
+
+Output: `true`
+
 ### date(string, interface {}) string
+
+Date can be a `time.Time` or an `int, int32, int64`.
+
+```tpl
+{{ date "2006-01-02" 1690151142 }}
+```
+
+Output: `2023-07-24`
+
 ### dateInZone(string, interface {}, string) string
 ### dateModify(string, time.Time) time.Time
 ### date_in_zone(string, interface {}, string) string
@@ -160,20 +277,84 @@ Output: `123`
 ### default(interface {}, []interface {}) interface {}
 ### derivePassword(uint32, string, string, string, string) string
 ### dict([]interface {}) map[string]interface {}
+
+```tpl
+{{ dict "a" 1 "b" 2 }}
+```
+
+Output: `map[a:1 b:2]`
+
 ### dig([]interface {}) (interface {}, error)
 ### dir(string) string
+
+`path.Dir` function.
+
+```tpl
+{{ dir "/foo/bar/baz.js" }}
+```
+
+Output: `/foo/bar`
+
 ### div(interface {}, interface {}) int64
 ### divf(interface {}, []interface {}) float64
 ### duration(interface {}) string
+
+```tpl
+{{ duration "3600" }}
+```
+
+Output: `1h0m0s`
+
 ### durationRound(interface {}) string
 ### empty(interface {}) bool
+
+```tpl
+{{ empty "" }}
+```
+
+Output: `true`
+
 ### encryptAES(string, string) (string, error)
 ### env(string) string
-### exec(string) (map[string]interface {}, error)
-### execTemplate(string, interface {}) (string, error)
+
+```tpl
+{{ env "HOME" }}
+```
+
+Output: `/home/rytsh`
+
 ### expandenv(string) string
+
+```tpl
+{{ expandenv "$HOME" }}
+{{ expandenv "${USER}" }}
+```
+
+Output:
+
+```
+/home/rytsh
+rytsh
+```
+
 ### ext(string) string
+
+`path.Ext` function.
+
+```tpl
+{{ ext "/foo/bar/baz.js" }}
+```
+
+Output: `.js`
+
 ### fail(string) (string, error)
+
+```tpl
+{{ fail "FAILED PROGRAM" }}
+```
+
+Output: program fail, exit code 1
+
 ### first(interface {}) interface {}
 ### float64(interface {}) float64
 ### floor(interface {}) float64
@@ -436,10 +617,10 @@ Trust required!
 ### file.Write(fileName string, data []byte) (bool, error)
 ### file.Read(fileName string) ([]byte, error)
 
-## html
+## html2
 
-### html.EscapeString(v string) string
-### html.UnescapeString(v string) string
+### html2.EscapeString(v string) string
+### html2.UnescapeString(v string) string
 
 ## humanize
 
@@ -468,6 +649,29 @@ Functions of [github.com/dustin/go-humanize](https://github.com/dustin/go-humani
 ### humanize.Time(then time.Time) string
 
 ## log
+
+Before to use log functions, you need to give a logger when initialize `fstore` functions.
+
+Example of zerolog usage:
+
+```go
+fstore.FuncMap(
+	fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+)
+```
+
+Arguments should be support `Adapter` interface.
+
+```go
+type Adapter interface {
+	Error(msg string, keysAndValues ...interface{})
+	Info(msg string, keysAndValues ...interface{})
+	Debug(msg string, keysAndValues ...interface{})
+	Warn(msg string, keysAndValues ...interface{})
+}
+```
+
+Log functions return the same value as input.
 
 ### log.Debug(v any) any
 ### log.Info(v any) any

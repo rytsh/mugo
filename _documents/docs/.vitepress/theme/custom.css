@@ -1,0 +1,11 @@
+:root{
+    --vp-c-brand: var(--vp-c-red);
+    --vp-c-brand-light: var(--vp-c-red-light);
+    --vp-c-brand-lighter: var(--vp-c-red-lighter);
+    --vp-c-brand-dark: var(--vp-c-red-dark);
+    --vp-c-brand-darker: var(--vp-c-red-darker);
+    --vp-c-mute: #ffd670;
+    --vp-c-text-code: #14213d;
+    --vp-button-alt-bg: var(--vp-c-bg-soft);
+    --vp-home-hero-name-color: #00b4d8;
+}

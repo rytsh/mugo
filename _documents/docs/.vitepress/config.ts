@@ -28,6 +28,14 @@ export default defineConfig({
         items: [
           { text: 'Reference', link: '/functions/reference.md' },
         ]
+      },
+      {
+        text: 'Go Template',
+        collapsed: false,
+        items: [
+          { text: 'Intro', link: '/templates/intro.md' },
+          { text: 'Examples', link: '/templates/examples.md' },
+        ]
       }
     ],
 
