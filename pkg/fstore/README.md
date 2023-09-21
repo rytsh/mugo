@@ -3,7 +3,7 @@
 fstore have bunch of go-template functions.
 
 ```sh
-go get github.com/rytsh/mugo/pkg/fstore
+import "github.com/rytsh/mugo/pkg/fstore"
 ```
 
 ## Usage

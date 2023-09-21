@@ -3,7 +3,7 @@
 templateX is a go template engine with some extra features.
 
 ```sh
-go get github.com/rytsh/mugo/pkg/templatex
+import "github.com/rytsh/mugo/pkg/templatex"
 ```
 
 ## Usage
