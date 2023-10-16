@@ -21,10 +21,10 @@ var (
 func New() *Request {
 	once.Do(func() {
 		client, _ := klient.New(
-			klient.OptionClient.WithInsecureSkipVerify(config.App.SkipVerify),
-			klient.OptionClient.WithLogger(logz.AdapterKV{Log: log.With().Str("source", "http").Logger()}),
-			klient.OptionClient.WithDisableRetry(config.App.DisableRetry),
-			klient.OptionClient.WithDisableBaseURLCheck(true),
+			klient.WithInsecureSkipVerify(config.App.SkipVerify),
+			klient.WithLogger(logz.AdapterKV{Log: log.With().Str("source", "http").Logger()}),
+			klient.WithDisableRetry(config.App.DisableRetry),
+			klient.WithDisableBaseURLCheck(true),
 		)
 		Client = &Request{
 			client: client,

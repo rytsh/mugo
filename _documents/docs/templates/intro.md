@@ -26,7 +26,7 @@ This is a `values.yaml` file
 name: mugo
 ```
 
-And this si our template file `name.tpl`
+And this is our template file `name.tpl`
 
 ```tpl
 {{ .name }}
@@ -35,7 +35,7 @@ And this si our template file `name.tpl`
 To run with `mugo`
 
 ```sh
-mugo -s -d @values.yaml name.tpl
+mugo -s -d @values.yaml -t @name.tpl
 #mugo
 ```
 

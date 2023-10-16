@@ -13,8 +13,9 @@ var (
 type Config struct {
 	LogLevel     string
 	Data         []string
-	DataRaw      string
+	DataRaw      bool
 	Parse        []string
+	Template     string
 	Delims       string
 	Output       string
 	Silience     bool

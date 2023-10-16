@@ -1,5 +1,3 @@
-//go:generate go run ./sprig_gen.go
-
 package funcs
 
 import (

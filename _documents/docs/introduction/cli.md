@@ -1,5 +1,11 @@
 # CLI
 
+mugo accept stdin or file as template and data input.
+
+If you give template with `-t` option than input is data.  
+If you give data with `-d` option than input is template.  
+If you give both template and data than input is ignored.
+
 ```
 Usage:
   mugo <template> [flags]
@@ -9,10 +15,12 @@ mugo -d @data.yaml template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl
 mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"
+mugo -d '{"Name": "mugo"}' -t @template.tpl
+mugo -t '{{.Name}}' data.yaml
 
 Flags:
   -d, --data stringArray            input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
-  -r, --data-raw string             input data as raw or file path with @ prefix could be file with any extension
+  -r, --data-raw                    set input data as raw
       --delims string               comma or space separated list of delimiters to alternate the default "{{ }}"
       --disable-func stringArray    disabled functions for run template
       --disable-group stringArray   disabled groups for run template
@@ -30,7 +38,8 @@ Flags:
       --perm-file string            create file permission, default is 0644
       --perm-folder string          create folder permission, default is 0755
   -s, --silience                    silience log
-  -t, --trust                       trust to execute dangerous functions
+  -t, --template string             input template as raw or file path with @ prefix could be file with any extension
+      --trust                       trust to execute dangerous functions
   -v, --version                     version for mugo
   -w, --work-dir string             work directory for run template
 ```

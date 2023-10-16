@@ -61,7 +61,9 @@ var rootCmd = &cobra.Command{
 	Example: "mugo -d @data.yaml template.tpl" + "\n" +
 		`mugo -d '{"Name": "mugo"}' -o output.txt template.tpl` + "\n" +
 		`mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl` + "\n" +
-		`mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"`,
+		`mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"` + "\n" +
+		`mugo -d '{"Name": "mugo"}' -t @template.tpl` + "\n" +
+		`mugo -t '{{.Name}}' data.yaml`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		ctx := cmd.Context()
 
@@ -77,10 +79,6 @@ var rootCmd = &cobra.Command{
 			}
 
 			return nil
-		}
-
-		if len(args) == 0 {
-			return fmt.Errorf("missing template file")
 		}
 
 		if config.App.Delims != "" {
@@ -123,13 +121,16 @@ var rootCmd = &cobra.Command{
 
 			info = args[0]
 		} else {
-			// read from stdin
-			body, err := io.ReadAll(inputReader)
-			if err != nil {
-				return err
-			}
+			if !(len(config.App.Data) > 0 && config.App.Template != "") {
+				log.Info().Msgf("read input from stdin")
+				// read from stdin
+				body, err := io.ReadAll(inputReader)
+				if err != nil {
+					return err
+				}
 
-			inputData = body
+				inputData = body
+			}
 		}
 
 		if config.Checked.WorkDir == "" {
@@ -151,6 +152,11 @@ var rootCmd = &cobra.Command{
 
 // Execute is the entry point for the application.
 func Execute(ctx context.Context, appInfo AppInfo) error {
+	logLevel := os.Getenv("LOG_LEVEL")
+	if logLevel != "" {
+		config.App.LogLevel = logLevel
+	}
+
 	rootCmd.Version = appInfo.Version
 	rootCmd.Long += "\nversion: " + appInfo.Version + " commit: " + appInfo.BuildCommit + " buildDate:" + appInfo.BuildDate
 
@@ -161,7 +167,8 @@ func init() {
 	rootCmd.Flags().BoolVar(&config.App.HtmlTemplate, "html", config.App.HtmlTemplate, "use html/template instead")
 	rootCmd.Flags().StringVar(&config.App.Delims, "delims", config.App.Delims, "comma or space separated list of delimiters to alternate the default \"{{ }}\"")
 	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension")
-	rootCmd.Flags().StringVarP(&config.App.DataRaw, "data-raw", "r", config.App.DataRaw, "input data as raw or file path with @ prefix could be file with any extension")
+	rootCmd.Flags().BoolVarP(&config.App.DataRaw, "data-raw", "r", config.App.DataRaw, "set input data as raw")
+	rootCmd.Flags().StringVarP(&config.App.Template, "template", "t", config.App.Template, "input template as raw or file path with @ prefix could be file with any extension")
 	rootCmd.Flags().StringArrayVarP(&config.App.Parse, "parse", "p", config.App.Parse, "parse file pattern for define templates 'testdata/**/*.tpl'")
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
 	rootCmd.Flags().BoolVarP(&config.App.Silience, "silience", "s", config.App.Silience, "silience log")
@@ -171,15 +178,19 @@ func init() {
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledGroups, "disable-group", config.App.DisabledGroups, "disabled groups for run template")
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledFuncs, "disable-func", config.App.DisabledFuncs, "disabled functions for run template")
 	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.DisableAt, "disable @ prefix for file path")
-	rootCmd.Flags().BoolVarP(&config.App.Trust, "trust", "t", config.App.Trust, "trust to execute dangerous functions")
+	rootCmd.Flags().BoolVar(&config.App.Trust, "trust", config.App.Trust, "trust to execute dangerous functions")
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
-	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry")
+	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry on request")
 	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
 	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
 	rootCmd.Flags().StringVar(&config.App.FolderPerm, "perm-folder", config.App.FolderPerm, "create folder permission, default is 0755")
 	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")
 }
 
+// mugo is the main function for the application.
+//
+// input is the content, it could be template or data.
+// info is the information about the input, it could be file path or url.
 func mugo(ctx context.Context, input []byte, info string) (err error) {
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
@@ -256,21 +267,26 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	// read input data
 	var inputData interface{}
 
-	if config.App.DataRaw != "" {
-		if !config.App.DisableAt && config.App.DataRaw[0] == '@' {
-			if d, err := fileAPI.LoadRaw(config.App.DataRaw[1:]); err != nil {
-				return fmt.Errorf("failed to load input data: %w", err)
-			} else {
-				inputData = string(d)
-			}
-		} else {
-			inputData = config.App.DataRaw
-		}
-	} else {
+	{ // load data
 		var storeData interface{}
 		for _, data := range config.App.Data {
 			var currentData interface{}
 			var err error
+
+			if config.App.DataRaw {
+				if !config.App.DisableAt && data[0] == '@' {
+					d, err := fileAPI.LoadRaw(data[1:])
+					if err != nil {
+						return fmt.Errorf("failed to load input data: %w", err)
+					}
+
+					storeData = string(d)
+				} else {
+					storeData = data
+				}
+
+				continue
+			}
 
 			if !config.App.DisableAt && data[0] == '@' {
 				err = fileAPI.Load(data[1:], &currentData)
@@ -288,10 +304,42 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		inputData = storeData
 	}
 
-	log.Info().Msgf("output: %s", output.Name())
-	log.Info().Msgf("execute template: %s", info)
+	var templateData []byte
+	if config.App.Template != "" {
+		if !config.App.DisableAt && config.App.Template[0] == '@' {
+			if d, err := fileAPI.LoadRaw(config.App.Template[1:]); err != nil {
+				return fmt.Errorf("failed to load template: %w", err)
+			} else {
+				input = d
+			}
+		} else {
+			templateData = []byte(config.App.Template)
+		}
+	}
 
-	if err := tpl.Parse(string(input)); err != nil {
+	isInputTemplate := false
+	// templateData is not empty than input is data
+	if templateData == nil {
+		templateData = input
+		isInputTemplate = true
+	}
+
+	log.Info().Msgf("output: %s", output.Name())
+
+	if isInputTemplate {
+		log.Info().Msgf("execute template: %s", info)
+	} else if inputData == nil {
+		if config.App.DataRaw {
+			inputData = string(input)
+		} else {
+			if err := fileAPI.LoadContent(input, &inputData, fileAPI.Codec["YAML"]); err != nil {
+				return fmt.Errorf("failed to load input data: %w", err)
+			}
+		}
+	}
+
+	// run template
+	if err := tpl.Parse(string(templateData)); err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
 

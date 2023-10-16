@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	"os"
+	"sync"
 
 	"github.com/rs/zerolog/log"
 	"github.com/rytsh/mugo/cmd/mugo/args"
+	"github.com/worldline-go/initializer"
 	"github.com/worldline-go/logz"
 )
 
@@ -17,29 +18,26 @@ var (
 )
 
 func main() {
-	logz.InitializeLog(logz.WithCaller(false))
+	initializer.Init(
+		run,
+		initializer.WithInitLog(false),
+		initializer.WithOptionsLogz(logz.WithCaller(false)),
+	)
 
+}
+
+func run(ctx context.Context, wg *sync.WaitGroup) error {
 	appInfo := args.AppInfo{
 		Version:     version,
 		BuildCommit: commit,
 		BuildDate:   date,
 	}
 
-	var err error
-	defer func() {
-		// recover from panic if one occured to prevent os.Exit
-		if r := recover(); r != nil {
-			log.Panic().Msgf("%v", r)
-		}
-
-		if err != nil {
-			os.Exit(1)
-		}
-	}()
-
-	if err = args.Execute(context.Background(), appInfo); err != nil {
+	if err := args.Execute(context.Background(), appInfo); err != nil {
 		if !errors.Is(err, args.ErrShutdown) {
 			log.Error().Err(err).Msg("failed to execute command")
 		}
 	}
+
+	return nil
 }

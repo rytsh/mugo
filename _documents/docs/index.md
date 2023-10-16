@@ -4,7 +4,6 @@ layout: home
 
 hero:
   name: "mugo"
-  text: "documentation"
   tagline: go-template execution tool
   actions:
     - theme: brand
@@ -19,4 +18,6 @@ features:
     details: Powerful CLI to easily execute templates
   - title: Multiple Functions
     details: A lot of functions to help you build your templates
+  - title: Use as a library
+    details: Use as a library in your Go project
 ---
