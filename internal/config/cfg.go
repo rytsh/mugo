@@ -15,6 +15,7 @@ type Config struct {
 	Data         []string
 	DataRaw      string
 	Parse        []string
+	Template     string
 	Delims       string
 	Output       string
 	Silience     bool

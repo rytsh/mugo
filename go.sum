@@ -228,6 +228,8 @@ github.com/tdewolff/parse/v2 v2.6.6/go.mod h1:woz0cgbLwFdtbjJu8PIKxhW05KplTFQkOd
 github.com/tdewolff/test v1.0.7/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
 github.com/tdewolff/test v1.0.9 h1:SswqJCmeN4B+9gEAi/5uqT0qpi1y2/2O47V/1hhGZT0=
 github.com/tdewolff/test v1.0.9/go.mod h1:6DAvZliBAAnD7rhVgwaM7DE5/d9NMOAJ09SqYqeK4QE=
+github.com/worldline-go/initializer v0.2.3 h1:ovQRcNzscDJD/fjcHEuvxOzmcwF6VOI6XhWZY2ou4cQ=
+github.com/worldline-go/initializer v0.2.3/go.mod h1:UkLyW92jTTU3faHv/95dHisu36SszZRMt98Es22ye0Q=
 github.com/worldline-go/klient v0.6.0 h1:YqudqLJra6zaOjjbR4Hy8mMSnYaS3umgE+l1M9w0d7I=
 github.com/worldline-go/klient v0.6.0/go.mod h1:E72HFn1lyESM0ROiNQvwsnsbQOzKo4KCPgmFd2EV38g=
 github.com/worldline-go/logz v0.5.0 h1:o/xVrxo51Lt1F1Otu3In6wHSZlmCjzLZA8f9pEeGnE0=

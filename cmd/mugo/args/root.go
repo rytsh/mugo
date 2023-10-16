@@ -79,10 +79,6 @@ var rootCmd = &cobra.Command{
 			return nil
 		}
 
-		if len(args) == 0 {
-			return fmt.Errorf("missing template file")
-		}
-
 		if config.App.Delims != "" {
 			fields := strings.Fields(strings.ReplaceAll(config.App.Delims, ",", " "))
 			if len(fields) != 2 {
@@ -90,6 +86,10 @@ var rootCmd = &cobra.Command{
 			}
 
 			config.Checked.Delims = fields
+		}
+
+		if len(args) == 0 {
+			return fmt.Errorf("missing input")
 		}
 
 		var (
@@ -162,6 +162,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.App.Delims, "delims", config.App.Delims, "comma or space separated list of delimiters to alternate the default \"{{ }}\"")
 	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension")
 	rootCmd.Flags().StringVarP(&config.App.DataRaw, "data-raw", "r", config.App.DataRaw, "input data as raw or file path with @ prefix could be file with any extension")
+	rootCmd.Flags().StringVarP(&config.App.Template, "template", "t", config.App.Template, "input template as raw or file path with @ prefix could be file with any extension")
 	rootCmd.Flags().StringArrayVarP(&config.App.Parse, "parse", "p", config.App.Parse, "parse file pattern for define templates 'testdata/**/*.tpl'")
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
 	rootCmd.Flags().BoolVarP(&config.App.Silience, "silience", "s", config.App.Silience, "silience log")
@@ -171,7 +172,7 @@ func init() {
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledGroups, "disable-group", config.App.DisabledGroups, "disabled groups for run template")
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledFuncs, "disable-func", config.App.DisabledFuncs, "disabled functions for run template")
 	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.DisableAt, "disable @ prefix for file path")
-	rootCmd.Flags().BoolVarP(&config.App.Trust, "trust", "t", config.App.Trust, "trust to execute dangerous functions")
+	rootCmd.Flags().BoolVar(&config.App.Trust, "trust", config.App.Trust, "trust to execute dangerous functions")
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
 	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry")
 	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
@@ -180,6 +181,10 @@ func init() {
 	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")
 }
 
+// mugo is the main function for the application.
+//
+// input is the content, it could be template or data.
+// info is the information about the input, it could be file path or url.
 func mugo(ctx context.Context, input []byte, info string) (err error) {
 	wg := &sync.WaitGroup{}
 	defer wg.Wait()
