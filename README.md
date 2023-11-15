@@ -24,10 +24,12 @@ mugo -d @data.yaml template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt template.tpl
 mugo -d '{"Name": "mugo"}' -o output.txt - < template.tpl
 mugo -d '{"Name": "mugo"}' - <<< "{{.Name}}"
+mugo -d '{"Name": "mugo"}' -t @template.tpl
+mugo -t '{{.Name}}' data.yaml
 
 Flags:
   -d, --data stringArray            input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
-  -r, --data-raw string             input data as raw or file path with @ prefix could be file with any extension
+  -r, --data-raw                    set input data as raw
       --delims string               comma or space separated list of delimiters to alternate the default "{{ }}"
       --disable-func stringArray    disabled functions for run template
       --disable-group stringArray   disabled groups for run template
@@ -45,7 +47,8 @@ Flags:
       --perm-file string            create file permission, default is 0644
       --perm-folder string          create folder permission, default is 0755
   -s, --silience                    silience log
-  -t, --trust                       trust to execute dangerous functions
+  -t, --template string             input template as raw or file path with @ prefix could be file with any extension
+      --trust                       trust to execute dangerous functions
   -v, --version                     version for mugo
   -w, --work-dir string             work directory for run template
 ```
@@ -55,7 +58,7 @@ Flags:
 Read all folder and generate info json seperately:
 
 ```sh
-mugo -t -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." https://github.com/rytsh/mugo/raw/main/templates/folderInfo.tpl
+mugo --trust -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." https://github.com/rytsh/mugo/raw/main/templates/folderInfo.tpl
 ```
 
 ### Development
@@ -74,8 +77,8 @@ make build
 <details><summary>Example</summary>
 
 ```sh
-go run cmd/mugo/main.go -r "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
-go run cmd/mugo/main.go -t -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." - < testdata/readSeparateStart.tpl
+go run cmd/mugo/main.go -r -d "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
+go run cmd/mugo/main.go --trust -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." - < testdata/readSeparate.tpl
 ```
 
 </details>
