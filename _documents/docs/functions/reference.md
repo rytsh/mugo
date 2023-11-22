@@ -604,6 +604,7 @@ Functions of [github.com/spf13/cast](https://github.com/spf13/cast) package.
 ### crypto.SHA256B(v []byte) []byte
 ### crypto.FNV32a(v any) (int, error)
 ### crypto.HMAC(h interface{}, k interface{}, m interface{}) (string, error)
+### crypto.JwtParseUnverified(token string) (map[string]interface{}, error)
 
 ## faker
 

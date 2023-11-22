@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
+	"maps"
 	"sort"
 	"sync"
 )
@@ -154,6 +156,48 @@ func (t *Template) Parse(content string) error {
 	t.templateParsed = tpl
 
 	return nil
+}
+
+func (t *Template) ParseFS(fsys fs.FS, patterns ...string) error {
+	if t.templateParsed == nil {
+		tpl, err := t.template.Clone()
+		if err != nil {
+			return fmt.Errorf("execute clone error: %w", err)
+		}
+
+		t.templateParsed = tpl
+	}
+
+	tpl, err := t.templateParsed.ParseFS(fsys, patterns...)
+	if err != nil {
+		return fmt.Errorf("ParseFS error: %w", err)
+	}
+
+	t.templateParsed = tpl
+
+	return nil
+}
+
+func (t *Template) Clone() (*Template, error) {
+	tpl, err := t.template.Clone()
+	if err != nil {
+		return nil, fmt.Errorf("clone error: %w", err)
+	}
+
+	var tplParsed templateInf
+	if t.templateParsed != nil {
+		tplParsed, err = t.templateParsed.Clone()
+		if err != nil {
+			return nil, fmt.Errorf("clone parsed error: %w", err)
+		}
+	}
+
+	return &Template{
+		template:       tpl,
+		templateParsed: tplParsed,
+		funcs:          maps.Clone(t.funcs),
+		isHtmlTemplate: t.isHtmlTemplate,
+	}, nil
 }
 
 // Execute the template and write the output to the buffer.
