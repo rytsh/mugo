@@ -19,6 +19,7 @@ type Config struct {
 	Delims       string
 	Output       string
 	Silience     bool
+	NoStdin      bool
 	DisableAt    bool
 	Trust        bool
 	SkipVerify   bool
@@ -34,6 +35,8 @@ type Config struct {
 	DisabledFuncs  []string
 
 	HtmlTemplate bool
+
+	RandomSeed int64
 }
 
 type Check struct {

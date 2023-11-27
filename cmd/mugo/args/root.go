@@ -24,6 +24,7 @@ import (
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
 	"github.com/rytsh/mugo/pkg/fstore"
+	"github.com/rytsh/mugo/pkg/fstore/funcs/values"
 	"github.com/rytsh/mugo/pkg/fstore/registry"
 	"github.com/rytsh/mugo/pkg/templatex"
 )
@@ -121,7 +122,7 @@ var rootCmd = &cobra.Command{
 
 			info = args[0]
 		} else {
-			if !(len(config.App.Data) > 0 && config.App.Template != "") {
+			if !config.App.NoStdin && !(len(config.App.Data) > 0 && config.App.Template != "") {
 				log.Info().Msgf("read input from stdin")
 				// read from stdin
 				body, err := io.ReadAll(inputReader)
@@ -177,6 +178,7 @@ func init() {
 	rootCmd.Flags().StringArrayVar(&config.App.SpecificFuncs, "enable-func", config.App.SpecificFuncs, "specific functions for run template")
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledGroups, "disable-group", config.App.DisabledGroups, "disabled groups for run template")
 	rootCmd.Flags().StringArrayVar(&config.App.DisabledFuncs, "disable-func", config.App.DisabledFuncs, "disabled functions for run template")
+	rootCmd.Flags().BoolVarP(&config.App.NoStdin, "no-stdin", "n", config.App.NoStdin, "disable stdin input")
 	rootCmd.Flags().BoolVar(&config.App.DisableAt, "no-at", config.App.DisableAt, "disable @ prefix for file path")
 	rootCmd.Flags().BoolVar(&config.App.Trust, "trust", config.App.Trust, "trust to execute dangerous functions")
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
@@ -185,6 +187,7 @@ func init() {
 	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
 	rootCmd.Flags().StringVar(&config.App.FolderPerm, "perm-folder", config.App.FolderPerm, "create folder permission, default is 0755")
 	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")
+	rootCmd.Flags().Int64Var(&config.App.RandomSeed, "random-seed", config.App.RandomSeed, "seed for random function, default is 0 (random by time)")
 }
 
 // mugo is the main function for the application.
@@ -223,6 +226,10 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	}()
 
 	httpReq := request.New()
+
+	if config.App.RandomSeed != 0 {
+		values.RandomSeed(config.App.RandomSeed)
+	}
 
 	tpl := templatex.New(templatex.WithAddFuncsTpl(
 		FStore(),
@@ -331,7 +338,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	} else if inputData == nil {
 		if config.App.DataRaw {
 			inputData = string(input)
-		} else {
+		} else if input != nil {
 			if err := fileAPI.LoadContent(input, &inputData, fileAPI.Codec["YAML"]); err != nil {
 				return fmt.Errorf("failed to load input data: %w", err)
 			}

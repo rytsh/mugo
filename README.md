@@ -41,11 +41,13 @@ Flags:
   -l, --list                        function list
       --log-level string            log level (debug, info, warn, error, fatal, panic), default is info (default "info")
       --no-at                       disable @ prefix for file path
-      --no-retry                    disable retry
+      --no-retry                    disable retry on request
+  -n, --no-stdin                    disable stdin input
   -o, --output string               output file, default is stdout
   -p, --parse stringArray           parse file pattern for define templates 'testdata/**/*.tpl'
       --perm-file string            create file permission, default is 0644
       --perm-folder string          create folder permission, default is 0755
+      --random-seed int             seed for random function, default is 0 (random by time)
   -s, --silience                    silience log
   -t, --template string             input template as raw or file path with @ prefix could be file with any extension
       --trust                       trust to execute dangerous functions

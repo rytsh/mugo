@@ -702,3 +702,16 @@ Log functions return the same value as input.
 ### time.AddDuration(t time.Time, d time.Duration) time.Time
 ### time.Duration(d string) (time.Duration, error)
 ### time.AddDate(t time.Time, years, months, days int) time.Time
+
+## random
+
+### random.Intn(min, max int) int
+### random.Alpha(n int) string
+### random.AlphaNum(n int) string
+### random.Ascii(n int) string
+### random.Numeric(n int) string
+### random.Float(min float64, max float64) float64
+
+## math
+
+### math.RoundDecimal(precision int, value float64) float64
