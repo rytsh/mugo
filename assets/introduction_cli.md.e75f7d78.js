@@ -23,13 +23,15 @@ import{_ as s,o as a,c as n,O as t}from"./chunks/framework.cdae9d71.js";const m=
 <span class="line"><span style="color:#A6ACCD;">  -l, --list                        function list</span></span>
 <span class="line"><span style="color:#A6ACCD;">      --log-level string            log level (debug, info, warn, error, fatal, panic), default is info (default &quot;info&quot;)</span></span>
 <span class="line"><span style="color:#A6ACCD;">      --no-at                       disable @ prefix for file path</span></span>
-<span class="line"><span style="color:#A6ACCD;">      --no-retry                    disable retry</span></span>
+<span class="line"><span style="color:#A6ACCD;">      --no-retry                    disable retry on request</span></span>
+<span class="line"><span style="color:#A6ACCD;">  -n, --no-stdin                    disable stdin input</span></span>
 <span class="line"><span style="color:#A6ACCD;">  -o, --output string               output file, default is stdout</span></span>
 <span class="line"><span style="color:#A6ACCD;">  -p, --parse stringArray           parse file pattern for define templates &#39;testdata/**/*.tpl&#39;</span></span>
 <span class="line"><span style="color:#A6ACCD;">      --perm-file string            create file permission, default is 0644</span></span>
 <span class="line"><span style="color:#A6ACCD;">      --perm-folder string          create folder permission, default is 0755</span></span>
+<span class="line"><span style="color:#A6ACCD;">      --random-seed int             seed for random function, default is 0 (random by time)</span></span>
 <span class="line"><span style="color:#A6ACCD;">  -s, --silience                    silience log</span></span>
 <span class="line"><span style="color:#A6ACCD;">  -t, --template string             input template as raw or file path with @ prefix could be file with any extension</span></span>
 <span class="line"><span style="color:#A6ACCD;">      --trust                       trust to execute dangerous functions</span></span>
 <span class="line"><span style="color:#A6ACCD;">  -v, --version                     version for mugo</span></span>
-<span class="line"><span style="color:#A6ACCD;">  -w, --work-dir string             work directory for run template</span></span></code></pre></div>`,4),p=[l];function o(i,r,c,u,A,d){return a(),n("div",null,p)}const f=s(e,[["render",o]]);export{m as __pageData,f as default};
+<span class="line"><span style="color:#A6ACCD;">  -w, --work-dir string             work directory for run template</span></span></code></pre></div>`,4),p=[l];function o(i,r,c,u,d,A){return a(),n("div",null,p)}const f=s(e,[["render",o]]);export{m as __pageData,f as default};
