@@ -21,6 +21,7 @@ mugo -t '{{.Name}}' data.yaml
 Flags:
   -d, --data stringArray            input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension
   -r, --data-raw                    set input data as raw
+  -b, --data-raw-byte               raw data is byte
       --delims string               comma or space separated list of delimiters to alternate the default "{{ }}"
       --disable-func stringArray    disabled functions for run template
       --disable-group stringArray   disabled groups for run template
