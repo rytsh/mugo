@@ -17,8 +17,8 @@ func init() {
 
 type Codec struct{}
 
-func (Codec) JsonDecode(v []byte) (map[string]interface{}, error) {
-	var data map[string]interface{}
+func (Codec) JsonDecode(v []byte) (any, error) {
+	var data any
 	err := json.Unmarshal(v, &data)
 	if err != nil {
 		return nil, err
@@ -35,8 +35,8 @@ func (Codec) JsonEncode(v any, pretty bool) ([]byte, error) {
 	return json.Marshal(v)
 }
 
-func (Codec) YamlDecode(v []byte) (map[string]interface{}, error) {
-	var data map[string]interface{}
+func (Codec) YamlDecode(v []byte) (any, error) {
+	var data any
 	err := yaml.Unmarshal(v, &data)
 	if err != nil {
 		return nil, err
@@ -49,8 +49,8 @@ func (Codec) YamlEncode(v any) ([]byte, error) {
 	return yaml.Marshal(v)
 }
 
-func (Codec) TomlDecode(v []byte) (map[string]interface{}, error) {
-	var data map[string]interface{}
+func (Codec) TomlDecode(v []byte) (any, error) {
+	var data any
 	if _, err := toml.NewDecoder(bytes.NewReader(v)).Decode(&data); err != nil {
 		return nil, err
 	}

@@ -580,11 +580,11 @@ Functions of [github.com/spf13/cast](https://github.com/spf13/cast) package.
 
 ## codec
 
-### codec.JsonDecode(v []byte) (map[string]interface{}, error)
+### codec.JsonDecode(v []byte) (any, error)
 ### codec.JsonEncode(v any, pretty bool) ([]byte, error)
-### codec.YamlDecode(v []byte) (map[string]interface{}, error)
+### codec.YamlDecode(v []byte) (any, error)
 ### codec.YamlEncode(v any) ([]byte, error)
-### codec.TomlDecode(v []byte) (map[string]interface{}, error)
+### codec.TomlDecode(v []byte) (any, error)
 ### codec.TomlEncode(v any) ([]byte, error)
 ### codec.Markdown(data []byte) []byte
 ### codec.ByteToString(b []byte) string

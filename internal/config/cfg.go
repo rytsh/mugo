@@ -14,6 +14,7 @@ type Config struct {
 	LogLevel     string
 	Data         []string
 	DataRaw      bool
+	DataRawByte  bool
 	Parse        []string
 	Template     string
 	Delims       string

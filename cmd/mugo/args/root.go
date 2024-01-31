@@ -169,6 +169,7 @@ func init() {
 	rootCmd.Flags().StringVar(&config.App.Delims, "delims", config.App.Delims, "comma or space separated list of delimiters to alternate the default \"{{ }}\"")
 	rootCmd.Flags().StringArrayVarP(&config.App.Data, "data", "d", config.App.Data, "input data as json/yaml or file path with @ prefix could be '.yaml','.yml','.json','.toml' extension")
 	rootCmd.Flags().BoolVarP(&config.App.DataRaw, "data-raw", "r", config.App.DataRaw, "set input data as raw")
+	rootCmd.Flags().BoolVarP(&config.App.DataRawByte, "data-raw-byte", "b", config.App.DataRawByte, "raw data is byte")
 	rootCmd.Flags().StringVarP(&config.App.Template, "template", "t", config.App.Template, "input template as raw or file path with @ prefix could be file with any extension")
 	rootCmd.Flags().StringArrayVarP(&config.App.Parse, "parse", "p", config.App.Parse, "parse file pattern for define templates 'testdata/**/*.tpl'")
 	rootCmd.Flags().StringVarP(&config.App.Output, "output", "o", config.App.Output, "output file, default is stdout")
@@ -287,7 +288,11 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 						return fmt.Errorf("failed to load input data: %w", err)
 					}
 
-					storeData = string(d)
+					if config.App.DataRawByte {
+						storeData = d
+					} else {
+						storeData = string(d)
+					}
 				} else {
 					storeData = data
 				}
@@ -337,7 +342,11 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		log.Info().Msgf("execute template: %s", info)
 	} else if inputData == nil {
 		if config.App.DataRaw {
-			inputData = string(input)
+			if config.App.DataRawByte {
+				inputData = input
+			} else {
+				inputData = string(input)
+			}
 		} else if input != nil {
 			if err := fileAPI.LoadContent(input, &inputData, fileAPI.Codec["YAML"]); err != nil {
 				return fmt.Errorf("failed to load input data: %w", err)
