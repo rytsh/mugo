@@ -22,7 +22,7 @@ test-data: ## Run the application
 
 .PHONY: build
 build: ## Build the binary file
-	goreleaser build --snapshot --rm-dist --single-target
+	goreleaser build --snapshot --clean --single-target
 
 .PHONY: lint
 lint: ## Lint Go files
