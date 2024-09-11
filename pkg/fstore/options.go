@@ -1,8 +1,8 @@
 package fstore
 
 import (
+	"github.com/rakunlabs/logi/logadapter"
 	"github.com/rytsh/mugo/pkg/fstore/registry"
-	"github.com/worldline-go/logz"
 )
 
 type options struct {
@@ -12,7 +12,7 @@ type options struct {
 	specificGroups map[string]struct{}
 
 	trust           bool
-	log             logz.Adapter
+	log             logadapter.Adapter
 	workDir         string
 	executeTemplate registry.ExecuteTemplate
 }
@@ -82,7 +82,7 @@ func WithExecuteTemplate(t registry.ExecuteTemplate) Option {
 	}
 }
 
-func WithLog(log logz.Adapter) Option {
+func WithLog(log logadapter.Adapter) Option {
 	return func(options *options) {
 		options.log = log
 	}

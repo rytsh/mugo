@@ -1,10 +1,10 @@
-import { defineConfig } from 'vitepress'
-
-// https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default {
   title: "mugo",
   description: "documentation",
   base: "/mugo/",
+  markdown: {
+    theme: "dracula",
+  },
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
@@ -43,4 +43,4 @@ export default defineConfig({
       { icon: 'github', link: 'https://github.com/rytsh/mugo' }
     ]
   }
-})
+}

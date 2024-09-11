@@ -6,65 +6,38 @@ VERSION   := $(or $(IMAGE_TAG),$(shell git describe --tags --first-parent --matc
 
 LOCAL_BIN_DIR := $(PWD)/bin
 
-## golangci configuration
-GOLANGCI_CONFIG_URL   := https://raw.githubusercontent.com/worldline-go/guide/main/lint/.golangci.yml
-GOLANGCI_LINT_VERSION := v1.52.2
-
 .DEFAULT_GOAL := help
 
-.PHONY: run test-data build copy-bin golangci lint test coverage html html-gen html-wsl clean help
-
+.PHONY: run
 run: ## Run the application
 	go run $(MAIN_FILE)
 
+.PHONY: docs-view
 docs-view: ## Docs dev
 	cd _documents && pnpm run docs:dev
 
+.PHONY: test-data
 test-data: ## Run the application
 	go run $(MAIN_FILE) -d @testdata/data/input.yaml testdata/test.tpl
 
+.PHONY: build
 build: ## Build the binary file
 	goreleaser build --snapshot --rm-dist --single-target
 
-copy-bin: ## Copy the binary file to the ~/bin directory
-	cp ./dist/$(BINARY)_linux_amd64_v1/$(BINARY) ~/bin/$(BINARY)
+.PHONY: lint
+lint: ## Lint Go files
+	@golangci-lint --version
+	@GOPATH="$(shell dirname $(PWD))" golangci-lint run ./...
 
-.golangci.yml:
-	@$(MAKE) golangci
+.PHONY: lint-main
+lint-main: ## Lint Go files with main branch diff
+	@golangci-lint --version
+	@GOPATH="$(shell dirname $(PWD))" golangci-lint run --new-from-rev main ./...
 
-golangci: ## Download .golangci.yml file
-	@curl --insecure -o .golangci.yml -L'#' $(GOLANGCI_CONFIG_URL)
-
-bin/golangci-lint-$(GOLANGCI_LINT_VERSION):
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s -- -b $(LOCAL_BIN_DIR) $(GOLANGCI_LINT_VERSION)
-	@mv $(LOCAL_BIN_DIR)/golangci-lint $(LOCAL_BIN_DIR)/golangci-lint-$(GOLANGCI_LINT_VERSION)
-
-lint: .golangci.yml bin/golangci-lint-$(GOLANGCI_LINT_VERSION) ## Lint Go files
-	@$(LOCAL_BIN_DIR)/golangci-lint-$(GOLANGCI_LINT_VERSION) --version
-	@GOPATH="$(shell dirname $(PWD))" $(LOCAL_BIN_DIR)/golangci-lint-$(GOLANGCI_LINT_VERSION) run ./...
-
-lint-main: .golangci.yml bin/golangci-lint-$(GOLANGCI_LINT_VERSION) ## Lint Go files
-	@$(LOCAL_BIN_DIR)/golangci-lint-$(GOLANGCI_LINT_VERSION) --version
-	@GOPATH="$(shell dirname $(PWD))" $(LOCAL_BIN_DIR)/golangci-lint-$(GOLANGCI_LINT_VERSION) run --new-from-rev main ./...
-
+.PHONY: test
 test: ## Run unit tests
-	@go test -v -race ./...
+	@go test -v -race -cover -coverpkg=./... -covermode=atomic ./...
 
-coverage: ## Run unit tests with coverage
-	@go test -v -race -cover -coverpkg=./... -coverprofile=coverage.out -covermode=atomic ./...
-	@go tool cover -func=coverage.out
-
-html: ## Show html coverage result
-	@go tool cover -html=./coverage.out
-
-html-gen: ## Export html coverage result
-	@go tool cover -html=./coverage.out -o ./coverage.html
-
-html-wsl: html-gen ## Open html coverage result in wsl
-	@explorer.exe `wslpath -w ./coverage.html` || true
-
-clean: ## Remove previous build
-	@rm -f $(BINARY)
-
+.PHONY: help
 help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'

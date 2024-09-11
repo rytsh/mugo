@@ -3,12 +3,11 @@ package main
 import (
 	"context"
 	"errors"
-	"sync"
 
+	"github.com/rakunlabs/into"
+	"github.com/rakunlabs/logi"
 	"github.com/rs/zerolog/log"
 	"github.com/rytsh/mugo/cmd/mugo/args"
-	"github.com/worldline-go/initializer"
-	"github.com/worldline-go/logz"
 )
 
 var (
@@ -18,22 +17,23 @@ var (
 )
 
 func main() {
-	initializer.Init(
+	into.Init(
 		run,
-		initializer.WithInitLog(false),
-		initializer.WithOptionsLogz(logz.WithCaller(false)),
+		into.WithLogger(logi.InitializeLog(logi.WithCaller(false))),
+		into.WithStartFn(nil),
+		into.WithStopFn(nil),
 	)
 
 }
 
-func run(ctx context.Context, wg *sync.WaitGroup) error {
+func run(ctx context.Context) error {
 	appInfo := args.AppInfo{
 		Version:     version,
 		BuildCommit: commit,
 		BuildDate:   date,
 	}
 
-	if err := args.Execute(context.Background(), appInfo); err != nil {
+	if err := args.Execute(ctx, appInfo); err != nil {
 		if !errors.Is(err, args.ErrShutdown) {
 			log.Error().Err(err).Msg("failed to execute command")
 		}

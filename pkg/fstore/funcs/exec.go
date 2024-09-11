@@ -7,8 +7,8 @@ import (
 
 	"github.com/cli/safeexec"
 	"github.com/kballard/go-shellquote"
+	"github.com/rakunlabs/logi/logadapter"
 	"github.com/rytsh/liz/shutdown"
-	"github.com/worldline-go/logz"
 
 	"github.com/rytsh/mugo/pkg/fstore/registry"
 )
@@ -19,14 +19,14 @@ func init() {
 
 type Exec struct {
 	trust bool
-	log   logz.Adapter
+	log   logadapter.Adapter
 }
 
-func (e Exec) init(trust bool, log logz.Adapter) any {
+func (e Exec) init(trust bool, log logadapter.Adapter) any {
 	e.trust = trust
 	e.log = log
 	if e.log == nil {
-		e.log = logz.AdapterNoop{}
+		e.log = logadapter.Noop{}
 	}
 
 	return e.Exec

@@ -4,13 +4,12 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/http"
 	"sync"
 
-	"github.com/rs/zerolog/log"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/worldline-go/klient"
-	"github.com/worldline-go/logz"
 )
 
 var (
@@ -22,7 +21,7 @@ func New() *Request {
 	once.Do(func() {
 		client, _ := klient.New(
 			klient.WithInsecureSkipVerify(config.App.SkipVerify),
-			klient.WithLogger(logz.AdapterKV{Log: log.With().Str("source", "http").Logger()}),
+			klient.WithLogger(slog.Default()),
 			klient.WithDisableRetry(config.App.DisableRetry),
 			klient.WithDisableBaseURLCheck(true),
 		)

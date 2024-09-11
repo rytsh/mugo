@@ -5,20 +5,18 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log/slog"
 	"net/url"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"strings"
-	"sync"
-	"syscall"
 
-	"github.com/rs/zerolog/log"
+	"github.com/rakunlabs/into"
+	"github.com/rakunlabs/logi"
 	"github.com/rytsh/liz/file"
 	"github.com/rytsh/liz/mapx"
 	"github.com/rytsh/liz/shutdown"
 	"github.com/spf13/cobra"
-	"github.com/worldline-go/logz"
 
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
@@ -45,18 +43,16 @@ var rootCmd = &cobra.Command{
 	SilenceErrors: true,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		if config.App.Silience {
-			err := logz.SetLogLevel("error")
-			if err != nil {
-				log.Error().Err(err).Msg("failed to set log level")
+			if err := logi.SetLogLevel("ERROR"); err != nil {
+				slog.Error("failed to set log level", slog.String("error", err.Error()))
 			}
 		} else {
-			err := logz.SetLogLevel(config.App.LogLevel)
-			if err != nil {
-				log.Error().Err(err).Msg("failed to set log level")
+			if err := logi.SetLogLevel(config.App.LogLevel); err != nil {
+				slog.Error("failed to set log level", slog.String("error", err.Error()))
 			}
 		}
 
-		log.Info().Msgf("MUGO [%s]", cmd.Version)
+		slog.Info("MUGO [" + cmd.Version + "]")
 	},
 
 	Example: "mugo -d @data.yaml template.tpl" + "\n" +
@@ -69,7 +65,7 @@ var rootCmd = &cobra.Command{
 		ctx := cmd.Context()
 
 		if config.App.List {
-			log.Info().Msgf("print function list")
+			slog.Info("print function list")
 
 			tpl := templatex.New(templatex.WithAddFuncsTpl(
 				FStore(),
@@ -123,7 +119,7 @@ var rootCmd = &cobra.Command{
 			info = args[0]
 		} else {
 			if !config.App.NoStdin && !(len(config.App.Data) > 0 && config.App.Template != "") {
-				log.Info().Msgf("read input from stdin")
+				slog.Info("read input from stdin")
 				// read from stdin
 				body, err := io.ReadAll(inputReader)
 				if err != nil {
@@ -196,37 +192,8 @@ func init() {
 // input is the content, it could be template or data.
 // info is the information about the input, it could be file path or url.
 func mugo(ctx context.Context, input []byte, info string) (err error) {
-	wg := &sync.WaitGroup{}
-	defer wg.Wait()
-
-	ctx, ctxCancel := context.WithCancel(ctx)
-	defer ctxCancel()
-
-	wg.Add(1)
-	go shutdown.Global.WatchCtx(ctx, wg)
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-
-		sig := make(chan os.Signal, 1)
-		signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
-
-		select {
-		case <-sig:
-			log.Warn().Msg("received shutdown signal")
-			ctxCancel()
-
-			if err != nil {
-				err = ErrShutdown
-			}
-		case <-ctx.Done():
-		}
-
-		shutdown.Global.Run()
-	}()
-
 	httpReq := request.New()
+	into.ShutdownAdd(into.FnWarp(shutdown.Global.Run), "shutdown funcs")
 
 	if config.App.RandomSeed != 0 {
 		values.RandomSeed(config.App.RandomSeed)
@@ -336,10 +303,10 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		isInputTemplate = true
 	}
 
-	log.Info().Msgf("output: %s", output.Name())
+	slog.Info("output: " + output.Name())
 
 	if isInputTemplate {
-		log.Info().Msgf("execute template: %s", info)
+		slog.Info("execute template: " + info)
 	} else if inputData == nil {
 		if config.App.DataRaw {
 			if config.App.DataRawByte {
@@ -367,7 +334,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		return fmt.Errorf("failed to execute template: %w", err)
 	}
 
-	log.Info().Msg("render completed")
+	slog.Info("render completed")
 
 	return nil
 }
@@ -388,7 +355,7 @@ func FStore() func(t registry.ExecuteTemplate) map[string]interface{} {
 		fstore.WithDisableGroups(config.App.DisabledGroups...),
 		fstore.WithDisableFuncs(config.App.DisabledFuncs...),
 
-		fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+		fstore.WithLog(slog.Default()),
 		fstore.WithTrust(config.App.Trust),
 		fstore.WithWorkDir(config.Checked.WorkDir),
 	)

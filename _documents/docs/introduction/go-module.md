@@ -7,6 +7,10 @@ Mugo's internal template runner and functions are available as a Go package.
 `templatex` is a package that provides a template runner with options.
 
 ```sh
+go get github.com/rytsh/mugo
+```
+
+```sh
 import "github.com/rytsh/mugo/pkg/templatex"
 ```
 
@@ -46,6 +50,10 @@ fmt.Printf("%s", output.String())
 ## fstore
 
 `fstore` is a package that provides bunch of functions with options.
+
+```sh
+go get github.com/rytsh/mugo
+```
 
 ```sh
 import "github.com/rytsh/mugo/pkg/fstore"
