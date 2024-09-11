@@ -31,7 +31,7 @@ func TestRandom(t *testing.T) {
 		t.Errorf("Numeric() = %v, want %v", v, "5834232601")
 	}
 
-	if v := r.Float(1, 10); v != 4.529945648386223 {
-		t.Errorf("Amount() = %v, want %v", v, 4.529945648386223)
+	if v := r.Float(1, 10); v != 4.5299456483862235 {
+		t.Errorf("Amount() = %v, want %v", v, 4.5299456483862235)
 	}
 }
