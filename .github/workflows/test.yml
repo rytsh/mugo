@@ -15,7 +15,7 @@ jobs:
       with:
         go-version: 1.23 # The Go version to download (if necessary) and use.
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v6
+      uses: golangci/golangci-lint-action@v3
     - name: Run tests
       run: |
         GOPATH="$(dirname ${PWD})" golangci-lint run --out-format checkstyle ./... > golangci-lint-report.out || true
