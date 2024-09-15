@@ -1,9 +1,30 @@
 package fstore
 
 import (
-	_ "github.com/rytsh/mugo/pkg/fstore/funcs"
-	"github.com/rytsh/mugo/pkg/fstore/registry"
+	"io"
+	"time"
+
+	"github.com/rytsh/mugo/pkg/fstore/registry/cast"
+	"github.com/rytsh/mugo/pkg/fstore/registry/codec"
+	"github.com/rytsh/mugo/pkg/fstore/registry/crypto"
+	"github.com/rytsh/mugo/pkg/fstore/registry/exec"
+	"github.com/rytsh/mugo/pkg/fstore/registry/external"
+	"github.com/rytsh/mugo/pkg/fstore/registry/faker"
+	"github.com/rytsh/mugo/pkg/fstore/registry/file"
+	"github.com/rytsh/mugo/pkg/fstore/registry/html2"
+	"github.com/rytsh/mugo/pkg/fstore/registry/humanize"
+	"github.com/rytsh/mugo/pkg/fstore/registry/log"
+	"github.com/rytsh/mugo/pkg/fstore/registry/maps"
+	"github.com/rytsh/mugo/pkg/fstore/registry/math"
+	"github.com/rytsh/mugo/pkg/fstore/registry/minify"
+	"github.com/rytsh/mugo/pkg/fstore/registry/os"
+	"github.com/rytsh/mugo/pkg/fstore/registry/random"
+	"github.com/rytsh/mugo/pkg/fstore/registry/template"
 )
+
+type ExecuteTemplate interface {
+	ExecuteTemplate(wr io.Writer, name string, data any) error
+}
 
 func FuncMap(opts ...Option) map[string]interface{} {
 	opt := optionRun(opts...)
@@ -11,12 +32,12 @@ func FuncMap(opts ...Option) map[string]interface{} {
 	return funcX(opt)(opt.executeTemplate)
 }
 
-func FuncMapTpl(opts ...Option) func(t registry.ExecuteTemplate) map[string]interface{} {
+func FuncMapTpl(opts ...Option) func(t ExecuteTemplate) map[string]interface{} {
 	return funcX(optionRun(opts...))
 }
 
-func optionRun(opts ...Option) options {
-	opt := options{
+func optionRun(opts ...Option) option {
+	opt := option{
 		disableFuncs:   make(map[string]struct{}),
 		disableGroups:  make(map[string]struct{}),
 		specificFunc:   make(map[string]struct{}),
@@ -29,73 +50,33 @@ func optionRun(opts ...Option) options {
 	return opt
 }
 
-func funcX(o options) func(t registry.ExecuteTemplate) map[string]interface{} {
-	return func(t registry.ExecuteTemplate) map[string]interface{} {
-		v := make(map[string]interface{})
-
-		// custom functions
-		registry.CallReg.
-			AddArgument("trust", o.trust).
-			AddArgument("log", nil).
-			AddArgument("template", t).
-			AddArgument("workDir", o.workDir)
-
-		for _, fName := range registry.CallReg.GetFunctionNames() {
-			// fname is a group and not a specific group
-			if registry.IsGroup(fName) && !isSpecificGroup(o, fName) {
-				continue
-			}
-
-			switch vTyped := registry.GetFunc(fName).(type) {
-			case map[string]interface{}:
-				for key, value := range vTyped {
-					if !isSpecificFunc(o, key) {
-						continue
-					}
-
-					v[key] = value
-				}
-			default:
-				if !isSpecificFunc(o, fName) {
-					continue
-				}
-
-				v[fName] = vTyped
-			}
+func funcX(o option) func(t ExecuteTemplate) map[string]interface{} {
+	return func(t ExecuteTemplate) map[string]interface{} {
+		v := valuer{
+			Opt:   o,
+			Value: make(map[string]interface{}),
 		}
 
-		return v
+		v.addGroup("sprig", external.Sprig)
+		v.addGroup("helper", external.Helper)
+
+		v.addFunc("cast", returnWithFn(cast.Cast{}))
+		v.addFunc("codec", returnWithFn(codec.Codec{}))
+		v.addFunc("crypto", returnWithFn(crypto.Crypto{}))
+		v.addFunc("exec", returnWithFn(exec.New(o.trust, o.log)))
+		v.addFunc("faker", returnWithFn(faker.Faker{}))
+		v.addFunc("file", returnWithFn(file.New(o.trust)))
+		v.addFunc("html2", returnWithFn(html2.HTML2{}))
+		v.addFunc("humanize", returnWithFn(humanize.Humanize{}))
+		v.addFunc("log", returnWithFn(log.Log{}))
+		v.addFunc("map", returnWithFn(maps.New()))
+		v.addFunc("math", returnWithFn(math.Math{}))
+		v.addFunc("minify", returnWithFn(minify.Minify{}))
+		v.addFunc("os", returnWithFn(os.New(o.workDir)))
+		v.addFunc("random", returnWithFn(random.Random{}))
+		v.addFunc("template", returnWithFn(template.New(t)))
+		v.addFunc("time", returnWithFn(time.Time{}))
+
+		return v.Value
 	}
-}
-
-func isSpecificFunc(o options, name string) bool {
-	if _, ok := o.disableFuncs[name]; ok {
-		return false
-	}
-
-	if len(o.specificFunc) > 0 {
-		if _, ok := o.specificFunc[name]; ok {
-			return true
-		}
-
-		return false
-	}
-
-	return true
-}
-
-func isSpecificGroup(o options, name string) bool {
-	if _, ok := o.disableGroups[name]; ok {
-		return false
-	}
-
-	if len(o.specificGroups) > 0 {
-		if _, ok := o.specificGroups[name]; ok {
-			return true
-		}
-
-		return false
-	}
-
-	return true
 }

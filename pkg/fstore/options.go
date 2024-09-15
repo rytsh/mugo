@@ -2,10 +2,9 @@ package fstore
 
 import (
 	"github.com/rakunlabs/logi/logadapter"
-	"github.com/rytsh/mugo/pkg/fstore/registry"
 )
 
-type options struct {
+type option struct {
 	disableFuncs   map[string]struct{}
 	disableGroups  map[string]struct{}
 	specificFunc   map[string]struct{}
@@ -14,16 +13,16 @@ type options struct {
 	trust           bool
 	log             logadapter.Adapter
 	workDir         string
-	executeTemplate registry.ExecuteTemplate
+	executeTemplate ExecuteTemplate
 }
 
-type Option func(options *options)
+type Option func(option *option)
 
 // WithSpecificFuncs is a option for just enable specific functions.
 func WithSpecificFuncs(specificFuncs ...string) Option {
-	return func(options *options) {
+	return func(option *option) {
 		for _, f := range specificFuncs {
-			options.specificFunc[f] = struct{}{}
+			option.specificFunc[f] = struct{}{}
 		}
 	}
 }
@@ -32,9 +31,9 @@ func WithSpecificFuncs(specificFuncs ...string) Option {
 //
 //	WithSpecificGroups("sprig")
 func WithSpecificGroups(specificGroups ...string) Option {
-	return func(options *options) {
+	return func(option *option) {
 		for _, f := range specificGroups {
-			options.specificGroups[f] = struct{}{}
+			option.specificGroups[f] = struct{}{}
 		}
 	}
 }
@@ -43,9 +42,9 @@ func WithSpecificGroups(specificGroups ...string) Option {
 //
 //	WithDisableGroups("sprig")
 func WithDisableGroups(disableGroups ...string) Option {
-	return func(options *options) {
+	return func(option *option) {
 		for _, g := range disableGroups {
-			options.disableGroups[g] = struct{}{}
+			option.disableGroups[g] = struct{}{}
 		}
 	}
 }
@@ -54,9 +53,9 @@ func WithDisableGroups(disableGroups ...string) Option {
 //
 //	WithDisableFuncs("exec", "execTemplate")
 func WithDisableFuncs(disableFuncs ...string) Option {
-	return func(options *options) {
+	return func(option *option) {
 		for _, f := range disableFuncs {
-			options.disableFuncs[f] = struct{}{}
+			option.disableFuncs[f] = struct{}{}
 		}
 	}
 }
@@ -64,26 +63,26 @@ func WithDisableFuncs(disableFuncs ...string) Option {
 // WithTrust is a option for trust.
 // Some functions are not safe to use such as "exec".
 func WithTrust(trust bool) Option {
-	return func(options *options) {
-		options.trust = trust
+	return func(option *option) {
+		option.trust = trust
 	}
 }
 
 // WithWorkDir is a option for workDir.
 func WithWorkDir(workDir string) Option {
-	return func(options *options) {
-		options.workDir = workDir
+	return func(option *option) {
+		option.workDir = workDir
 	}
 }
 
-func WithExecuteTemplate(t registry.ExecuteTemplate) Option {
-	return func(options *options) {
-		options.executeTemplate = t
+func WithExecuteTemplate(t ExecuteTemplate) Option {
+	return func(option *option) {
+		option.executeTemplate = t
 	}
 }
 
 func WithLog(log logadapter.Adapter) Option {
-	return func(options *options) {
-		options.log = log
+	return func(option *option) {
+		option.log = log
 	}
 }

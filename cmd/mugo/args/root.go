@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math/rand"
 	"net/url"
 	"os"
 	"path/filepath"
@@ -22,8 +23,7 @@ import (
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
 	"github.com/rytsh/mugo/pkg/fstore"
-	"github.com/rytsh/mugo/pkg/fstore/funcs/values"
-	"github.com/rytsh/mugo/pkg/fstore/registry"
+	"github.com/rytsh/mugo/pkg/fstore/registry/random"
 	"github.com/rytsh/mugo/pkg/templatex"
 )
 
@@ -196,7 +196,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	into.ShutdownAdd(into.FnWarp(shutdown.Global.Run), "shutdown funcs")
 
 	if config.App.RandomSeed != 0 {
-		values.RandomSeed(config.App.RandomSeed)
+		random.DefaultRandom = rand.New(rand.NewSource(config.App.RandomSeed))
 	}
 
 	tpl := templatex.New(templatex.WithAddFuncsTpl(
@@ -348,7 +348,7 @@ func ReadAll(r io.Reader) (string, error) {
 	return string(content), nil
 }
 
-func FStore() func(t registry.ExecuteTemplate) map[string]interface{} {
+func FStore() func(t fstore.ExecuteTemplate) map[string]interface{} {
 	return fstore.FuncMapTpl(
 		fstore.WithSpecificGroups(config.App.SpecificGroups...),
 		fstore.WithSpecificFuncs(config.App.SpecificFuncs...),

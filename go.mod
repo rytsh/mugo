@@ -15,7 +15,6 @@ require (
 	github.com/rakunlabs/into v0.3.3
 	github.com/rakunlabs/logi v0.3.3
 	github.com/rs/zerolog v1.33.0
-	github.com/rytsh/call v0.2.1
 	github.com/rytsh/liz/file v0.1.4
 	github.com/rytsh/liz/mapx v0.2.0
 	github.com/rytsh/liz/shutdown v0.1.0
