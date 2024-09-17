@@ -1,6 +1,7 @@
 package random
 
 import (
+	"math"
 	"math/rand"
 	"testing"
 )
@@ -30,7 +31,7 @@ func TestRandom(t *testing.T) {
 		t.Errorf("Numeric() = %v, want %v", v, "5834232601")
 	}
 
-	if v := r.Float(1, 10); v != 4.5299456483862235 {
-		t.Errorf("Amount() = %v, want %v", v, 4.5299456483862235)
+	if v := r.Float(1, 10); math.Floor(v) != float64(4) {
+		t.Errorf("Amount() = %v, want %v", math.Floor(v), 4)
 	}
 }

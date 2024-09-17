@@ -26,6 +26,7 @@ export default {
         text: 'Functions',
         collapsed: false,
         items: [
+          { text: 'List', link: '/functions/list.md' },
           { text: 'Reference', link: '/functions/reference.md' },
         ]
       },

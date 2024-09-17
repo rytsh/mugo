@@ -27,6 +27,14 @@ func (s *valuer) addGroup(name string, fn func() map[string]interface{}) {
 	}
 
 	for k, f := range fn() {
+		if !isEnable(k, s.Opt, false) {
+			continue
+		}
+
+		if f == nil {
+			continue
+		}
+
 		s.Value[k] = f
 	}
 }

@@ -2,7 +2,6 @@ package args
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"log/slog"
@@ -32,8 +31,6 @@ type AppInfo struct {
 	BuildCommit string
 	BuildDate   string
 }
-
-var ErrShutdown = errors.New("shutting down signal received")
 
 var rootCmd = &cobra.Command{
 	Use:           "mugo <template>",
@@ -180,7 +177,7 @@ func init() {
 	rootCmd.Flags().BoolVar(&config.App.Trust, "trust", config.App.Trust, "trust to execute dangerous functions")
 	rootCmd.Flags().BoolVarP(&config.App.SkipVerify, "insecure", "k", config.App.SkipVerify, "skip verify ssl certificate")
 	rootCmd.Flags().BoolVar(&config.App.DisableRetry, "no-retry", config.App.DisableRetry, "disable retry on request")
-	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error, fatal, panic), default is info")
+	rootCmd.Flags().StringVar(&config.App.LogLevel, "log-level", config.App.LogLevel, "log level (debug, info, warn, error), default is info")
 	rootCmd.Flags().StringVarP(&config.Checked.WorkDir, "work-dir", "w", config.Checked.WorkDir, "work directory for run template")
 	rootCmd.Flags().StringVar(&config.App.FolderPerm, "perm-folder", config.App.FolderPerm, "create folder permission, default is 0755")
 	rootCmd.Flags().StringVar(&config.App.FilePerm, "perm-file", config.App.FilePerm, "create file permission, default is 0644")

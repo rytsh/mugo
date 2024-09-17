@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"errors"
+	"log/slog"
 
 	"github.com/rakunlabs/into"
 	"github.com/rakunlabs/logi"
-	"github.com/rs/zerolog/log"
 	"github.com/rytsh/mugo/cmd/mugo/args"
 )
 
@@ -22,8 +21,10 @@ func main() {
 		into.WithLogger(logi.InitializeLog(logi.WithCaller(false))),
 		into.WithStartFn(nil),
 		into.WithStopFn(nil),
+		into.WithRunErrFn(func(err error) {
+			slog.Error("command failed", slog.String("error", err.Error()))
+		}),
 	)
-
 }
 
 func run(ctx context.Context) error {
@@ -33,11 +34,5 @@ func run(ctx context.Context) error {
 		BuildDate:   date,
 	}
 
-	if err := args.Execute(ctx, appInfo); err != nil {
-		if !errors.Is(err, args.ErrShutdown) {
-			log.Error().Err(err).Msg("failed to execute command")
-		}
-	}
-
-	return nil
+	return args.Execute(ctx, appInfo)
 }

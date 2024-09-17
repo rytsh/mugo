@@ -18,19 +18,21 @@ type SubFuncs struct {
 	Name     string
 	Type     reflect.Type
 	Inner    uint8
-	First    bool
 	TypeName string
+	First    bool
+	End      uint8
 }
 
 func (t *Template) FuncInfos() []Info {
-	var infos []Info
+	infos := make([]Info, 0, len(t.funcs))
 
+	infoMap := make(map[string]struct{})
 	for name, fn := range t.funcs {
 		// get function signature with reflect as string
 		reflectFn := reflect.ValueOf(fn)
 		reflectFnType := reflectFn.Type()
 
-		description := extractDescription(name, reflectFnType)
+		description := extractDescription(name, reflectFnType, infoMap)
 
 		infos = append(infos, Info{
 			Name:        name,
@@ -41,14 +43,16 @@ func (t *Template) FuncInfos() []Info {
 	return infos
 }
 
-func extractDescription(name string, reflectFnTypeOrg reflect.Type) string {
+func extractDescription(name string, reflectFnTypeOrg reflect.Type, infoMap map[string]struct{}) string {
 	description := strings.Builder{}
 
 	subFuncs := []SubFuncs{
 		{Name: name, Type: reflectFnTypeOrg, Inner: 0},
 	}
 
-	infoMap := make(map[string]struct{})
+	if infoMap == nil {
+		infoMap = make(map[string]struct{})
+	}
 
 	for len(subFuncs) > 0 {
 		sub := subFuncs[0]
@@ -57,99 +61,151 @@ func extractDescription(name string, reflectFnTypeOrg reflect.Type) string {
 		reflectFnType := sub.Type
 		reflectFnParams := reflectFnType.NumIn()
 
+		lineDescription := strings.Builder{}
+
+		innerLineStr := ""
+		extensionLineStr := ""
+		addFirstLine := false
+		addLastLine := false
+		addEndLine := false
+
 		skipArg := 0
 		if sub.Inner > 0 {
 			// if subfunction, skip first parameter
 			skipArg = 1
 
 			switch {
-			// case len(subFuncs) > 0 && sub.Inner > 1 && sub.First:
-			// 	description.WriteString("\n" + strings.Repeat(" ", int(sub.Inner-1)) + "└─ ")
+			case sub.Inner > 1 && sub.First && len(subFuncs) > 0 && sub.Inner == subFuncs[0].Inner:
+				innerLineStr = "\n" + strings.Repeat(" ", int(sub.End)) + strings.Repeat("│", max(int(sub.Inner)-1-int(sub.End), 0)) + "├─ "
+			case sub.Inner > 1 && len(subFuncs) > 0 && sub.Inner != subFuncs[0].Inner:
+				addLastLine = true
+				extensionLineStr = "└─ "
+				innerLineStr = "\n" + strings.Repeat("│", max(int(sub.Inner)-1, 0))
 			case len(subFuncs) > 0:
-				description.WriteString("\n" + strings.Repeat(" ", int(sub.Inner)) + "├─ ")
+				addFirstLine = true
+				extensionLineStr = "├─ "
+				innerLineStr = "\n" + strings.Repeat(" ", int(sub.End)) + strings.Repeat("│", max(int(sub.Inner)-1-int(sub.End), 0))
 			default:
-				description.WriteString("\n └─ ")
+				addEndLine = true
+				extensionLineStr = "└─ "
+				innerLineStr = "\n" + strings.Repeat(" ", int(sub.End)) + strings.Repeat("│", max(int(sub.Inner)-1-int(sub.End), 0))
 			}
 		}
 
 		reflectFnResults := reflectFnType.NumOut()
-
-		// get function description
-		description.WriteString(sub.Name + "(")
+		lineDescription.WriteString(sub.Name + "(")
 		if reflectFnParams > 0 {
 			for i := skipArg; i < reflectFnParams; i++ {
 				if reflectFnType.IsVariadic() && i == reflectFnParams-1 {
-					description.WriteString("..." + reflectFnType.In(i).Elem().String())
+					lineDescription.WriteString("..." + reflectFnType.In(i).Elem().String())
 					continue
 				}
 
-				description.WriteString(reflectFnType.In(i).String())
+				lineDescription.WriteString(reflectFnType.In(i).String())
 				if i < reflectFnParams-1 {
-					description.WriteString(", ")
+					lineDescription.WriteString(", ")
 				}
 			}
 		}
 
-		description.WriteString(")")
+		lineDescription.WriteString(")")
+
+		first := true
 
 		if reflectFnResults > 0 {
 			if reflectFnResults > 1 {
-				description.WriteString(" (")
+				lineDescription.WriteString(" (")
 			} else {
-				description.WriteString(" ")
+				lineDescription.WriteString(" ")
 			}
 
-			for i := 0; i < reflectFnResults; i++ {
+			for i := range reflectFnResults {
 				out := reflectFnType.Out(i)
 				outKind := out.Kind()
+				outStr := out.String()
+				outStrTrim := strings.TrimPrefix(outStr, "*")
 
-				description.WriteString(out.String())
+				lineDescription.WriteString(outStr)
 
-				if strings.Contains(out.String(), sub.TypeName) {
-					first := true
+				check := sub.TypeName
+				if check == "" {
+					check = sub.Name
+				}
+
+				if strings.Contains(outStr, check) {
+					if sub.TypeName == "" {
+						if _, ok := infoMap[outStrTrim]; ok {
+							continue
+						}
+
+						infoMap[outStrTrim] = struct{}{}
+					}
+
+					var subM []SubFuncs
 					if outKind == reflect.Struct || outKind == reflect.Pointer {
-						if out.NumMethod() > 0 {
-							for i := 0; i < out.NumMethod(); i++ {
-								if !out.Method(i).IsExported() {
-									continue
-								}
-
-								// prevent duplicate
-								if _, ok := infoMap[out.Method(i).Name]; ok {
-									continue
-								}
-
-								subFuncs = append([]SubFuncs{{
-									Name:     out.Method(i).Name,
-									Type:     out.Method(i).Type,
-									Inner:    sub.Inner + 1,
-									First:    first,
-									TypeName: stringCut(out.String()),
-								}}, subFuncs...)
-
-								first = false
-
-								infoMap[out.Method(i).Name] = struct{}{}
+						for iMethod := range out.NumMethod() {
+							outMethod := out.Method(iMethod)
+							if !outMethod.IsExported() {
+								continue
 							}
+
+							// prevent duplicate
+							if _, ok := infoMap[outStrTrim+"."+outMethod.Name]; ok {
+								continue
+							}
+
+							infoMap[outStrTrim+"."+outMethod.Name] = struct{}{}
+
+							end := sub.End
+							if addEndLine {
+								end = sub.End + 1
+							}
+
+							subM = append(subM, SubFuncs{
+								Name:     outMethod.Name,
+								Type:     outMethod.Type,
+								Inner:    sub.Inner + 1,
+								TypeName: strCut(outStr),
+								First:    first,
+								End:      end,
+							})
+
+							first = false
 						}
 					}
+
+					subFuncs = append(subM, subFuncs...)
 				}
 
 				if i < reflectFnResults-1 {
-					description.WriteString(", ")
+					lineDescription.WriteString(", ")
 				}
 			}
 
 			if reflectFnResults > 1 {
-				description.WriteString(")")
+				lineDescription.WriteString(")")
 			}
 		}
+
+		if addFirstLine && !first {
+			extensionLineStr = "├┐ "
+		}
+
+		if addLastLine && !first {
+			extensionLineStr = "└┐ "
+		}
+
+		if addEndLine && !first {
+			extensionLineStr = "└┐ "
+		}
+
+		description.WriteString(innerLineStr + extensionLineStr + lineDescription.String())
 	}
 
 	return description.String()
 }
 
-func stringCut(s string) string {
+func strCut(s string) string {
 	i := strings.Index(s, ".")
 
 	if i == -1 {

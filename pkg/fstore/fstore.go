@@ -20,6 +20,7 @@ import (
 	"github.com/rytsh/mugo/pkg/fstore/registry/os"
 	"github.com/rytsh/mugo/pkg/fstore/registry/random"
 	"github.com/rytsh/mugo/pkg/fstore/registry/template"
+	"github.com/rytsh/mugo/pkg/fstore/registry/ungroup"
 )
 
 type ExecuteTemplate interface {
@@ -58,12 +59,14 @@ func funcX(o option) func(t ExecuteTemplate) map[string]interface{} {
 		}
 
 		v.addGroup("sprig", external.Sprig)
-		v.addGroup("helper", external.Helper)
+		v.addGroup("ungroup", ungroup.Ungroup)
+
+		v.addFunc("exec", exec.New(o.trust, o.log).Exec)
+		v.addFunc("execTemplate", template.New(t).ExecTemplate)
 
 		v.addFunc("cast", returnWithFn(cast.Cast{}))
 		v.addFunc("codec", returnWithFn(codec.Codec{}))
 		v.addFunc("crypto", returnWithFn(crypto.Crypto{}))
-		v.addFunc("exec", returnWithFn(exec.New(o.trust, o.log)))
 		v.addFunc("faker", returnWithFn(faker.Faker{}))
 		v.addFunc("file", returnWithFn(file.New(o.trust)))
 		v.addFunc("html2", returnWithFn(html2.HTML2{}))
@@ -74,7 +77,6 @@ func funcX(o option) func(t ExecuteTemplate) map[string]interface{} {
 		v.addFunc("minify", returnWithFn(minify.Minify{}))
 		v.addFunc("os", returnWithFn(os.New(o.workDir)))
 		v.addFunc("random", returnWithFn(random.Random{}))
-		v.addFunc("template", returnWithFn(template.New(t)))
 		v.addFunc("time", returnWithFn(time.Time{}))
 
 		return v.Value

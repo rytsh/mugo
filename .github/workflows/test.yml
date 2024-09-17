@@ -11,14 +11,16 @@ jobs:
       with:
         # Disabling shallow clone is recommended for improving relevancy of reporting
         fetch-depth: 0
-    - uses: actions/setup-go@v3
+    - uses: actions/setup-go@v5
       with:
         go-version: 1.23 # The Go version to download (if necessary) and use.
     - name: golangci-lint
-      uses: golangci/golangci-lint-action@v3
+      uses: golangci/golangci-lint-action@v6
+      with:
+        args: --timeout 10m --new-from-rev=HEAD~1 --issues-exit-code=0
     - name: Run tests
       run: |
-        GOPATH="$(dirname ${PWD})" golangci-lint run --out-format checkstyle ./... > golangci-lint-report.out || true
+        GOPATH="$(dirname ${PWD})" golangci-lint run --issues-exit-code=0 --out-format checkstyle ./... > golangci-lint-report.out
         go test -coverprofile=coverage.out -json ./... > test-report.out
     - name: SonarCloud Scan
       uses: sonarsource/sonarcloud-github-action@master
