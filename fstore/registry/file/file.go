@@ -3,7 +3,7 @@ package file
 import (
 	"github.com/rytsh/liz/file"
 
-	"github.com/rytsh/mugo/pkg/fstore/errors"
+	"github.com/rytsh/mugo/fstore/errors"
 )
 
 type File struct {

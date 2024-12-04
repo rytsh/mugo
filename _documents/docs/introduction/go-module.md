@@ -11,12 +11,12 @@ go get github.com/rytsh/mugo
 ```
 
 ```sh
-import "github.com/rytsh/mugo/pkg/templatex"
+import "github.com/rytsh/mugo/templatex"
 ```
 
 ### Usage
 
-Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/pkg/templatex](https://pkg.go.dev/github.com/rytsh/mugo/pkg/templatex)
+Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/templatex](https://pkg.go.dev/github.com/rytsh/mugo/templatex)
 
 ```go
 tpl := templatex.New()
@@ -56,12 +56,12 @@ go get github.com/rytsh/mugo
 ```
 
 ```sh
-import "github.com/rytsh/mugo/pkg/fstore"
+import "github.com/rytsh/mugo/fstore"
 ```
 
 ### Usage
 
-Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/pkg/fstore](https://pkg.go.dev/github.com/rytsh/mugo/pkg/fstore)
+Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/fstore](https://pkg.go.dev/github.com/rytsh/mugo/fstore)
 
 ```go
 tpl := template.New("test").Funcs(fstore.FuncMap())

@@ -6,7 +6,7 @@ import (
 	"log"
 	"text/template"
 
-	"github.com/rytsh/mugo/pkg/fstore"
+	"github.com/rytsh/mugo/fstore"
 )
 
 func Example() {

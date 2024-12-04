@@ -10,7 +10,7 @@ import (
 	"github.com/rakunlabs/logi/logadapter"
 	"github.com/rytsh/liz/shutdown"
 
-	"github.com/rytsh/mugo/pkg/fstore/errors"
+	"github.com/rytsh/mugo/fstore/errors"
 )
 
 type Exec struct {

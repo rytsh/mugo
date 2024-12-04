@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/rytsh/mugo/pkg/templatex"
+	"github.com/rytsh/mugo/templatex"
 )
 
 func Example() {

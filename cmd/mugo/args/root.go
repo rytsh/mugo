@@ -18,12 +18,12 @@ import (
 	"github.com/rytsh/liz/shutdown"
 	"github.com/spf13/cobra"
 
+	"github.com/rytsh/mugo/fstore"
+	"github.com/rytsh/mugo/fstore/registry/random"
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
 	"github.com/rytsh/mugo/internal/request"
-	"github.com/rytsh/mugo/pkg/fstore"
-	"github.com/rytsh/mugo/pkg/fstore/registry/random"
-	"github.com/rytsh/mugo/pkg/templatex"
+	"github.com/rytsh/mugo/templatex"
 )
 
 type AppInfo struct {
