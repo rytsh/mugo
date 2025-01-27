@@ -485,7 +485,31 @@ map() *maps.Map
 ├─ Get(string, map[string]interface {}) interface {}
 └─ Set(string, interface {}) map[string]interface {}
 math() math.Math
-└─ RoundDecimal(int, float64) float64
+├─ Abs(interface {}) (json.Number, error)
+├─ Add(interface {}, ...interface {}) (json.Number, error)
+├─ Ceil(interface {}) (json.Number, error)
+├─ Div(interface {}, ...interface {}) (json.Number, error)
+├─ Equal(interface {}, interface {}) (bool, error)
+├─ Floor(interface {}) (json.Number, error)
+├─ GreaterThan(interface {}, interface {}) (bool, error)
+├─ GreaterThanOrEqual(interface {}, interface {}) (bool, error)
+├─ LessThan(interface {}, interface {}) (bool, error)
+├─ LessThanOrEqual(interface {}, interface {}) (bool, error)
+├─ Max(interface {}, ...interface {}) (json.Number, error)
+├─ Min(interface {}, ...interface {}) (json.Number, error)
+├─ Mod(interface {}, interface {}) (json.Number, error)
+├─ Mul(interface {}, ...interface {}) (json.Number, error)
+├─ Pow(interface {}, interface {}) (json.Number, error)
+├─ Round(interface {}, interface {}) (json.Number, error)
+├─ RoundBankers(interface {}, interface {}) (json.Number, error)
+├─ RoundCash(interface {}, interface {}) (json.Number, error)
+├─ RoundCeil(interface {}, interface {}) (json.Number, error)
+├─ RoundDown(interface {}, interface {}) (json.Number, error)
+├─ RoundFloor(interface {}, interface {}) (json.Number, error)
+├─ RoundUp(interface {}, interface {}) (json.Number, error)
+├─ Sign(interface {}) (int, error)
+├─ Sub(interface {}, ...interface {}) (json.Number, error)
+└─ Truncate(interface {}, interface {}) (json.Number, error)
 max(interface {}, ...interface {}) int64
 maxf(interface {}, ...interface {}) float64
 merge(map[string]interface {}, ...map[string]interface {}) interface {}

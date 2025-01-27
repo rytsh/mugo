@@ -19,7 +19,7 @@ type Template struct {
 	mutex sync.RWMutex
 	funcs map[string]interface{}
 
-	isHtmlTemplate bool
+	isHTMLTemplate bool
 }
 
 // New returns a new Template.
@@ -35,8 +35,8 @@ func New(opts ...OptionTemplate) *Template {
 		opt(option)
 	}
 
-	tpl.isHtmlTemplate = option.isHtmlTemplate
-	tpl.template = newTemplateX(DefaultTemplateName, tpl.isHtmlTemplate)
+	tpl.isHTMLTemplate = option.isHTMLTemplate
+	tpl.template = newTemplateX(DefaultTemplateName, tpl.isHTMLTemplate)
 	tpl.funcs = make(map[string]interface{}, len(option.addFuncs))
 
 	tpl.AddFuncMap(
@@ -56,12 +56,12 @@ func (t *Template) ListFuncs() []Info {
 	return funcs
 }
 
-// SetTypeHtml converts the template to html template.
+// SetTypeHTML converts the template to html template.
 //
 // This function will reset the template when switching from text to html template.
-func (t *Template) SetTypeHtml() {
-	if !t.isHtmlTemplate {
-		t.isHtmlTemplate = true
+func (t *Template) SetTypeHTML() {
+	if !t.isHTMLTemplate {
+		t.isHTMLTemplate = true
 		t.Reset()
 	}
 }
@@ -70,15 +70,15 @@ func (t *Template) SetTypeHtml() {
 //
 // This function will reset the template when switching from html to text template.
 func (t *Template) SetTypeText() {
-	if t.isHtmlTemplate {
-		t.isHtmlTemplate = false
+	if t.isHTMLTemplate {
+		t.isHTMLTemplate = false
 		t.Reset()
 	}
 }
 
 // Reset the template and add the functions back.
 func (t *Template) Reset() {
-	t.template = newTemplateX(DefaultTemplateName, t.isHtmlTemplate)
+	t.template = newTemplateX(DefaultTemplateName, t.isHTMLTemplate)
 	t.templateParsed = nil
 
 	t.AddFuncMap(
@@ -196,7 +196,7 @@ func (t *Template) Clone() (*Template, error) {
 		template:       tpl,
 		templateParsed: tplParsed,
 		funcs:          maps.Clone(t.funcs),
-		isHtmlTemplate: t.isHtmlTemplate,
+		isHTMLTemplate: t.isHTMLTemplate,
 	}, nil
 }
 

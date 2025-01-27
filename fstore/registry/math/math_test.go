@@ -1,51 +1,45 @@
 package math
 
-import "testing"
+import (
+	"encoding/json"
+	"reflect"
+	"testing"
 
-func TestMath_RoundDecimal(t *testing.T) {
+	"github.com/shopspring/decimal"
+)
+
+func TestMath_Sub(t *testing.T) {
 	type args struct {
-		precision int
-		value     float64
+		a any
+		v []any
 	}
 	tests := []struct {
-		name string
-		m    Math
-		args args
-		want float64
+		name    string
+		m       Math
+		args    args
+		want    json.Number
+		wantErr bool
 	}{
 		{
-			name: "round 1.2345 to 1.2",
+			name: "Test 1",
 			m:    Math{},
 			args: args{
-				precision: 1,
-				value:     1.2345,
+				a: decimal.NewFromFloat(1.323),
+				v: []any{1.4324, 0.00321, 0.1},
 			},
-			want: 1.2,
-		},
-		{
-			name: "round 1.2345 to 1.23",
-			m:    Math{},
-			args: args{
-				precision: 2,
-				value:     1.2345,
-			},
-			want: 1.23,
-		},
-		{
-			name: "round 1.2345 to 1.235",
-			m:    Math{},
-			args: args{
-				precision: 3,
-				value:     1.2345,
-			},
-			want: 1.235,
+			want: json.Number("-0.21261"),
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			m := Math{}
-			if got := m.RoundDecimal(tt.args.precision, tt.args.value); got != tt.want {
-				t.Errorf("Math.RoundDecimal() = %v, want %v", got, tt.want)
+			got, err := m.Sub(tt.args.a, tt.args.v...)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Math.Sub() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("Math.Sub() = %v, want %v", got, tt.want)
 			}
 		})
 	}

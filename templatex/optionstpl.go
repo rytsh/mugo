@@ -4,14 +4,14 @@ type optionsTemplate struct {
 	addFuncs map[string]interface{}
 	fnValue  interface{}
 
-	isHtmlTemplate bool
+	isHTMLTemplate bool
 }
 
 type OptionTemplate func(*optionsTemplate)
 
 func WithHTMLTemplate() OptionTemplate {
 	return func(o *optionsTemplate) {
-		o.isHtmlTemplate = true
+		o.isHTMLTemplate = true
 	}
 }
 
@@ -68,7 +68,7 @@ func WithAddFuncsTpl[T any](fn func(T) map[string]interface{}) OptionTemplate {
 func WithAddFuncTpl[T any](key string, f func(T) interface{}) OptionTemplate {
 	return func(o *optionsTemplate) {
 		if o.addFuncs == nil {
-			o.addFuncs = make(map[string]interface{}, 1)
+			o.addFuncs = make(map[string]interface{})
 		}
 
 		o.addFuncs[key] = f(o.fnValue.(T))

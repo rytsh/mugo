@@ -714,4 +714,30 @@ Log functions return the same value as input.
 
 ## math
 
-### math.RoundDecimal(precision int, value float64) float64
+_decimal.Decimal_ functions, accepts any type of number with _decimal.Decimal_, _string_, _json.Number_.
+
+### Abs(interface {}) (json.Number, error)
+### Add(interface {}, ...interface {}) (json.Number, error)
+### Ceil(interface {}) (json.Number, error)
+### Div(interface {}, ...interface {}) (json.Number, error)
+### Equal(interface {}, interface {}) (bool, error)
+### Floor(interface {}) (json.Number, error)
+### GreaterThan(interface {}, interface {}) (bool, error)
+### GreaterThanOrEqual(interface {}, interface {}) (bool, error)
+### LessThan(interface {}, interface {}) (bool, error)
+### LessThanOrEqual(interface {}, interface {}) (bool, error)
+### Max(interface {}, ...interface {}) (json.Number, error)
+### Min(interface {}, ...interface {}) (json.Number, error)
+### Mod(interface {}, interface {}) (json.Number, error)
+### Mul(interface {}, ...interface {}) (json.Number, error)
+### Pow(interface {}, interface {}) (json.Number, error)
+### Round(interface {}, interface {}) (json.Number, error)
+### RoundBankers(interface {}, interface {}) (json.Number, error)
+### RoundCash(interface {}, interface {}) (json.Number, error)
+### RoundCeil(interface {}, interface {}) (json.Number, error)
+### RoundDown(interface {}, interface {}) (json.Number, error)
+### RoundFloor(interface {}, interface {}) (json.Number, error)
+### RoundUp(interface {}, interface {}) (json.Number, error)
+### Sign(interface {}) (int, error)
+### Sub(interface {}, ...interface {}) (json.Number, error)
+### Truncate(interface {}, interface {}) (json.Number, error)
