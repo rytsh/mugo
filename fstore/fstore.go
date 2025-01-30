@@ -2,7 +2,6 @@ package fstore
 
 import (
 	"io"
-	"time"
 
 	"github.com/rytsh/mugo/fstore/registry/cast"
 	"github.com/rytsh/mugo/fstore/registry/codec"
@@ -20,6 +19,7 @@ import (
 	"github.com/rytsh/mugo/fstore/registry/os"
 	"github.com/rytsh/mugo/fstore/registry/random"
 	"github.com/rytsh/mugo/fstore/registry/template"
+	"github.com/rytsh/mugo/fstore/registry/time"
 	"github.com/rytsh/mugo/fstore/registry/ungroup"
 )
 
