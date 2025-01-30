@@ -641,48 +641,52 @@ substr(int, int, string) string
 swapcase(string) string
 ternary(interface {}, interface {}, bool) interface {}
 time() time.Time
-├─ Add(time.Duration) time.Time
-├─ AddDate(int, int, int) time.Time
-├─ After(time.Time) bool
-├─ AppendFormat([]uint8, string) []uint8
-├─ Before(time.Time) bool
-├─ Clock() (int, int, int)
-├─ Compare(time.Time) int
-├─ Date() (int, time.Month, int)
-├─ Day() int
-├─ Equal(time.Time) bool
-├─ Format(string) string
-├─ GoString() string
-├─ GobEncode() ([]uint8, error)
-├─ Hour() int
-├─ ISOWeek() (int, int)
-├─ In(*time.Location) time.Time
-├─ IsDST() bool
-├─ IsZero() bool
-├─ Local() time.Time
-├┐ Location() *time.Location
-│└─ String() string
-├─ MarshalBinary() ([]uint8, error)
-├─ MarshalJSON() ([]uint8, error)
-├─ MarshalText() ([]uint8, error)
-├─ Minute() int
-├─ Month() time.Month
-├─ Nanosecond() int
-├─ Round(time.Duration) time.Time
-├─ Second() int
-├─ String() string
-├─ Sub(time.Time) time.Duration
-├─ Truncate(time.Duration) time.Time
-├─ UTC() time.Time
-├─ Unix() int64
-├─ UnixMicro() int64
-├─ UnixMilli() int64
-├─ UnixNano() int64
-├─ Weekday() time.Weekday
-├─ Year() int
-├─ YearDay() int
-├─ Zone() (string, int)
-└─ ZoneBounds() (time.Time, time.Time)
+├┐ AddDate(time.Time, int, int, int) time.Time
+│├─ Add(time.Duration) time.Time
+│├─ After(time.Time) bool
+│├─ AppendFormat([]uint8, string) []uint8
+│├─ Before(time.Time) bool
+│├─ Clock() (int, int, int)
+│├─ Compare(time.Time) int
+│├─ Date() (int, time.Month, int)
+│├─ Day() int
+│├─ Equal(time.Time) bool
+│├─ GoString() string
+│├─ GobEncode() ([]uint8, error)
+│├─ Hour() int
+│├─ ISOWeek() (int, int)
+│├─ In(*time.Location) time.Time
+│├─ IsDST() bool
+│├─ IsZero() bool
+│├─ Local() time.Time
+│├┐ Location() *time.Location
+││└─ String() string
+│├─ MarshalBinary() ([]uint8, error)
+│├─ MarshalJSON() ([]uint8, error)
+│├─ MarshalText() ([]uint8, error)
+│├─ Minute() int
+│├─ Month() time.Month
+│├─ Nanosecond() int
+│├─ Round(time.Duration) time.Time
+│├─ Second() int
+│├─ String() string
+│├─ Sub(time.Time) time.Duration
+│├─ Truncate(time.Duration) time.Time
+│├─ Unix() int64
+│├─ UnixMicro() int64
+│├─ UnixMilli() int64
+│├─ UnixNano() int64
+│├─ Weekday() time.Weekday
+│├─ Year() int
+│├─ YearDay() int
+│├─ Zone() (string, int)
+│└─ ZoneBounds() (time.Time, time.Time)
+├─ AddDuration(time.Time, time.Duration) time.Time
+├─ Duration(string) (time.Duration, error)
+├─ Format(string, time.Time) string
+├─ Now() time.Time
+├─ RFC3339() string
+└─ UTC(time.Time) time.Time
 title(string) string
 toDate(string, string) time.Time
 toDecimal(interface {}) int64
