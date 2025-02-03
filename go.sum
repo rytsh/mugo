@@ -101,8 +101,8 @@ github.com/tdewolff/test v1.0.11-0.20240106005702-7de5f7df4739 h1:IkjBCtQOOjIn03
 github.com/tdewolff/test v1.0.11-0.20240106005702-7de5f7df4739/go.mod h1:XPuWBzvdUzhCuxWO1ojpXsyzsA5bFoS3tO/Q3kFuTG8=
 github.com/twmb/tlscfg v1.2.1 h1:IU2efmP9utQEIV2fufpZjPq7xgcZK4qu25viD51BB44=
 github.com/twmb/tlscfg v1.2.1/go.mod h1:GameEQddljI+8Es373JfQEBvtI4dCTLKWGJbqT2kErs=
-github.com/worldline-go/klient v0.9.3 h1:+TZge6FLnK4u0/34CtI05RTkTr5BDkE9eJudzrJrIYs=
-github.com/worldline-go/klient v0.9.3/go.mod h1:lvBn2nliEhdT7qzti0xyvgmV8nLyiKYEPQj6TcVjYaM=
+github.com/worldline-go/klient v0.9.6 h1:OicO0f11YCi3JDLLx3WBvbuJ/l6c9KyzHfSNj/ws2uw=
+github.com/worldline-go/klient v0.9.6/go.mod h1:lvBn2nliEhdT7qzti0xyvgmV8nLyiKYEPQj6TcVjYaM=
 github.com/worldline-go/logz v0.5.1 h1:jpbKUd1FbecEzs7/p1zFH7tFtQ5demmc89Fa2YTHL/Q=
 github.com/worldline-go/logz v0.5.1/go.mod h1:CbiHbwLTA6oKud62HbmfwG5fgSZ6ppVbkSdRv44X8Vc=
 golang.org/x/crypto v0.32.0 h1:euUpcYgM8WcP71gNpTqQCn6rC2t6ULUPiOzfWaXVVfc=

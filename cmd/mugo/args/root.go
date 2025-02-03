@@ -96,7 +96,11 @@ var rootCmd = &cobra.Command{
 		if len(args) > 0 && args[0] != "-" {
 			// if p is an http url, we try to download it
 			if _, err := url.ParseRequestURI(args[0]); err == nil {
-				httpReq := request.New()
+				httpReq, err := request.New()
+				if err != nil {
+					return err
+				}
+
 				body, err := httpReq.Get(ctx, args[0])
 				if err != nil {
 					return err
@@ -189,7 +193,11 @@ func init() {
 // input is the content, it could be template or data.
 // info is the information about the input, it could be file path or url.
 func mugo(ctx context.Context, input []byte, info string) (err error) {
-	httpReq := request.New()
+	httpReq, err := request.New()
+	if err != nil {
+		return err
+	}
+
 	into.ShutdownAdd(into.FnWarp(shutdown.Global.Run), "shutdown funcs")
 
 	if config.App.RandomSeed != 0 {
@@ -303,7 +311,11 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	slog.Info("output: " + output.Name())
 
 	if isInputTemplate {
-		slog.Info("execute template: " + info)
+		if config.App.NoStdin && info == os.Stdin.Name() {
+			slog.Info("execute template")
+		} else {
+			slog.Info("execute template: " + info)
+		}
 	} else if inputData == nil {
 		if config.App.DataRaw {
 			if config.App.DataRawByte {

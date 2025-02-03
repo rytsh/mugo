@@ -6,31 +6,28 @@ import (
 	"io"
 	"log/slog"
 	"net/http"
-	"sync"
+
+	"github.com/worldline-go/klient"
 
 	"github.com/rytsh/mugo/internal/config"
-	"github.com/worldline-go/klient"
 )
 
-var (
-	Client *Request
-	once   sync.Once
-)
+func New() (*Request, error) {
+	client, err := klient.New(
+		klient.WithInsecureSkipVerify(config.App.SkipVerify),
+		klient.WithLogger(slog.Default()),
+		klient.WithDisableRetry(config.App.DisableRetry),
+		klient.WithDisableBaseURLCheck(true),
+	)
+	if err != nil {
+		return nil, err
+	}
 
-func New() *Request {
-	once.Do(func() {
-		client, _ := klient.New(
-			klient.WithInsecureSkipVerify(config.App.SkipVerify),
-			klient.WithLogger(slog.Default()),
-			klient.WithDisableRetry(config.App.DisableRetry),
-			klient.WithDisableBaseURLCheck(true),
-		)
-		Client = &Request{
-			client: client,
-		}
-	})
+	r := &Request{
+		client: client,
+	}
 
-	return Client
+	return r, nil
 }
 
 type Request struct {
@@ -44,23 +41,15 @@ func (r *Request) Get(ctx context.Context, url string) ([]byte, error) {
 		return nil, fmt.Errorf("failed to create request: %w", err)
 	}
 
-	if err := r.client.Do(
-		req,
-		func(r *http.Response) error {
-			if r.StatusCode < 200 || r.StatusCode >= 300 {
-				return fmt.Errorf("failed to download url %s: %s", url, r.Status)
-			}
+	if err := r.client.Do(req, func(r *http.Response) error {
+		if err := klient.UnexpectedResponse(r); err != nil {
+			return err
+		}
 
-			body, err := io.ReadAll(r.Body)
-			if err != nil {
-				return fmt.Errorf("failed to read response body: %w", err)
-			}
+		response, _ = io.ReadAll(r.Body)
 
-			response = body
-
-			return nil
-		},
-	); err != nil {
+		return nil
+	}); err != nil {
 		return nil, err
 	}
 

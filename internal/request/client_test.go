@@ -15,7 +15,11 @@ func TestRequest_Get(t *testing.T) {
 	}))
 	defer httpServer.Close()
 
-	client := New()
+	client, err := New()
+	if err != nil {
+		t.Errorf("New() error = %v", err)
+		return
+	}
 
 	want := []byte("Hello, world!")
 
