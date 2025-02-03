@@ -61,7 +61,7 @@ Flags:
 Read all folder and generate info json seperately:
 
 ```sh
-mugo --trust -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." https://github.com/rytsh/mugo/raw/main/data/templates/folderInfo.tpl
+mugo -s -r -d "Moo-ve over" https://github.com/rytsh/mugo/raw/main/data/templates/cow.tpl
 ```
 
 ### Development
@@ -82,6 +82,7 @@ make build
 ```sh
 go run cmd/mugo/main.go -r -d "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
 go run cmd/mugo/main.go --trust -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." - < testdata/readSeparate.tpl
+go run cmd/mugo/main.go --trust -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." data/templates/folderInfo.tpl
 ```
 
 </details>
