@@ -8,8 +8,8 @@ type Faker struct {
 	faker.Faker
 }
 
-func New() *Faker {
-	return &Faker{
+func New() Faker {
+	return Faker{
 		Faker: faker.New(),
 	}
 }

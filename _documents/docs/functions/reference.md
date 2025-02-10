@@ -672,14 +672,12 @@ type Adapter interface {
 }
 ```
 
-Log functions return the same value as input.
+Log functions return the same value (...interface{} part) as input.
 
-### log.Debug(v any) any
-### log.Info(v any) any
-### log.Warn(v any) any
-### log.Error(v any) any
-### log.Fatal(v any) any
-### log.Panic(v any) any
+### log.Debug(string, ...interface {}) interface {}
+### log.Error(string, ...interface {}) interface {}
+### log.Info(string, ...interface {}) interface {}
+### log.Warn(string, ...interface {}) interface {}
 
 ## map
 

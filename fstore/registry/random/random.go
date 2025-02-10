@@ -18,12 +18,12 @@ type Random struct {
 	Random *rand.Rand
 }
 
-func New(r *rand.Rand) *Random {
+func New(r *rand.Rand) Random {
 	if r == nil {
 		r = DefaultRandom
 	}
 
-	return &Random{
+	return Random{
 		Random: r,
 	}
 }

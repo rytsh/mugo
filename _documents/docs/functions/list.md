@@ -474,12 +474,10 @@ kindOf(interface {}) string
 last(interface {}) interface {}
 list(...interface {}) []interface {}
 log() log.Log
-├─ Debug(interface {}) interface {}
-├─ Error(interface {}) interface {}
-├─ Fatal(interface {}) interface {}
-├─ Info(interface {}) interface {}
-├─ Panic(interface {}) interface {}
-└─ Warn(interface {}) interface {}
+├─ Debug(string, ...interface {}) interface {}
+├─ Error(string, ...interface {}) interface {}
+├─ Info(string, ...interface {}) interface {}
+└─ Warn(string, ...interface {}) interface {}
 lower(string) string
 map() *maps.Map
 ├─ Get(string, map[string]interface {}) interface {}
@@ -516,7 +514,8 @@ merge(map[string]interface {}, ...map[string]interface {}) interface {}
 mergeOverwrite(map[string]interface {}, ...map[string]interface {}) interface {}
 min(interface {}, ...interface {}) int64
 minf(interface {}, ...interface {}) float64
-minify() minify.Minify
+minify() *minify.Minify
+└─ Minify(string, []uint8) ([]uint8, error)
 mod(interface {}, interface {}) int64
 mul(interface {}, ...interface {}) int64
 mulf(interface {}, ...interface {}) float64
@@ -577,7 +576,7 @@ randAscii(int) string
 randBytes(int) (string, error)
 randInt(int, int) int
 randNumeric(int) string
-random() random.Random
+random() *random.Random
 ├─ Alpha(int) string
 ├─ AlphaNum(int) string
 ├─ Ascii(int) string
