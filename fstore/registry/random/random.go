@@ -10,12 +10,16 @@ import (
 
 var DefaultRandom = rand.New(rand.NewSource(time.Now().UnixNano()))
 
+func SetDefaultRandomSeed(seed int64) {
+	DefaultRandom.Seed(seed)
+}
+
 type Random struct {
 	Random *rand.Rand
 }
 
 func New(r *rand.Rand) *Random {
-	if r != nil {
+	if r == nil {
 		r = DefaultRandom
 	}
 
@@ -31,6 +35,7 @@ func (r Random) random(count int, start int, end int, letters bool, numbers bool
 func (r Random) Intn(min, max int) int {
 	return r.Random.Intn(max-min) + min
 }
+
 func (r Random) Alpha(n int) string {
 	ret, _ := r.random(n, 0, 0, true, false)
 
@@ -54,6 +59,6 @@ func (r Random) Numeric(n int) string {
 	return ret
 }
 
-func (r Random) Float(min float64, max float64) float64 {
+func (r Random) Float(min, max float64) float64 {
 	return r.Random.Float64()*(max-min) + min
 }

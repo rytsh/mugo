@@ -1,37 +1,31 @@
 package log
 
 import (
-	"github.com/rs/zerolog/log"
+	"log/slog"
 )
 
 type Log struct{}
 
-func (Log) Debug(v any) any {
-	log.Debug().Msgf("%v\n", v)
-	return v
+func (Log) Debug(msg string, args ...any) any {
+	slog.Debug(msg, args...)
+
+	return args
 }
 
-func (Log) Info(v any) any {
-	log.Info().Msgf("%v\n", v)
-	return v
+func (Log) Info(msg string, args ...any) any {
+	slog.Info(msg, args...)
+
+	return args
 }
 
-func (Log) Warn(v any) any {
-	log.Warn().Msgf("%v\n", v)
-	return v
+func (Log) Warn(msg string, args ...any) any {
+	slog.Warn(msg, args...)
+
+	return args
 }
 
-func (Log) Error(v any) any {
-	log.Error().Msgf("%v\n", v)
-	return v
-}
+func (Log) Error(msg string, args ...any) any {
+	slog.Error(msg, args...)
 
-func (Log) Fatal(v any) any {
-	log.Fatal().Msgf("%v\n", v)
-	return v
-}
-
-func (Log) Panic(v any) any {
-	log.Panic().Msgf("%v\n", v)
-	return v
+	return args
 }
