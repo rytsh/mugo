@@ -27,3 +27,18 @@ Install the package:
 ```sh
 brew install mugo
 ```
+
+### Makefile
+
+```makefile
+.PHONY: check-tools
+check-tools: ## Check if required tools are installed
+	@echo "Checking if required tools are installed..."
+	@command -v ~/bin/mugo > /dev/null || make tools
+	@echo "All required tools are installed."
+
+.PHONY: tools
+tools: ## Install tools [mugo]
+	@echo "Installing tools..."
+	curl -fSL https://github.com/rytsh/mugo/releases/latest/download/mugo_Linux_x86_64.tar.gz | tar -xz --overwrite -C ~/bin/ mugo
+```
