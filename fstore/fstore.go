@@ -74,7 +74,7 @@ func funcX(o option) func(t ExecuteTemplate) map[string]interface{} {
 		v.addFunc("log", returnWithFn(log.Log{}))
 		v.addFunc("map", returnWithFn(maps.New()))
 		v.addFunc("math", returnWithFn(math.Math{}))
-		v.addFunc("minify", returnWithFn(minify.New()))
+		v.addFunc("minify", minify.New().Minify)
 		v.addFunc("os", returnWithFn(os.New(o.workDir)))
 		v.addFunc("random", returnWithFn(random.New(nil)))
 		v.addFunc("time", returnWithFn(time.Time{}))
