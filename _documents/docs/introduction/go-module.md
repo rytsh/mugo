@@ -32,7 +32,7 @@ tpl.AddFunc("sub", func(a, b int) int {
 var output bytes.Buffer
 if err := tpl.Execute(
     templatex.WithIO(&output),
-    templatex.WithData(map[string]interface{}{
+    templatex.WithData(map[string]any{
         "a": 1,
         "b": 2,
     }),
@@ -55,13 +55,44 @@ fmt.Printf("%s", output.String())
 go get github.com/rytsh/mugo
 ```
 
-```sh
-import "github.com/rytsh/mugo/fstore"
+```go
+import (
+	_ "github.com/rytsh/mugo/fstore/registry"
+
+    "github.com/rytsh/mugo/fstore"
+)
 ```
 
 ### Usage
 
 Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/fstore](https://pkg.go.dev/github.com/rytsh/mugo/fstore)
+
+fstore's functions not enabled by default and you need to import the registry package or you can import some packages under fstore/registry.
+
+```go
+import _ "github.com/rytsh/mugo/fstore/registry"
+
+// import (
+// 	_ "github.com/rytsh/mugo/fstore/registry/cast"
+// 	_ "github.com/rytsh/mugo/fstore/registry/codec"
+// 	_ "github.com/rytsh/mugo/fstore/registry/crypto"
+// 	_ "github.com/rytsh/mugo/fstore/registry/exec"
+// 	_ "github.com/rytsh/mugo/fstore/registry/faker"
+// 	_ "github.com/rytsh/mugo/fstore/registry/file"
+// 	_ "github.com/rytsh/mugo/fstore/registry/html2"
+// 	_ "github.com/rytsh/mugo/fstore/registry/humanize"
+// 	_ "github.com/rytsh/mugo/fstore/registry/log"
+// 	_ "github.com/rytsh/mugo/fstore/registry/maps"
+// 	_ "github.com/rytsh/mugo/fstore/registry/math"
+// 	_ "github.com/rytsh/mugo/fstore/registry/minify"
+// 	_ "github.com/rytsh/mugo/fstore/registry/os"
+// 	_ "github.com/rytsh/mugo/fstore/registry/random"
+// 	_ "github.com/rytsh/mugo/fstore/registry/sprig"
+// 	_ "github.com/rytsh/mugo/fstore/registry/template"
+// 	_ "github.com/rytsh/mugo/fstore/registry/time"
+// 	_ "github.com/rytsh/mugo/fstore/registry/ungroup"
+// )
+```
 
 ```go
 tpl := template.New("test").Funcs(fstore.FuncMap())
@@ -87,18 +118,19 @@ fmt.Printf("%s", output)
 Use the tpl to execute templates.
 
 ```go
-tpl := templatex.New(templatex.WithAddFuncsTpl(
-    fstore.FuncMapTpl(
-        fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+tpl := templatex.New(templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
+    return fstore.FuncMap(
+        // fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
         fstore.WithTrust(true),
         fstore.WithWorkDir("."),
-    ),
-))
+        fstore.WithExecuteTemplate(o.T),
+    )
+}))
 
 var buf bytes.Buffer
 err := tpl.Execute(
     templatex.WithContent("{{.Count}} items are made of {{.Material}}"),
-    templatex.WithData(map[string]interface{}{
+    templatex.WithData(map[string]any{
         "Count":    3,
         "Material": "wood",
     }),

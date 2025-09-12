@@ -22,7 +22,7 @@ func Example() {
 	var output bytes.Buffer
 	if err := tpl.Execute(
 		templatex.WithIO(&output),
-		templatex.WithData(map[string]interface{}{
+		templatex.WithData(map[string]any{
 			"a": 1,
 			"b": 2,
 		}),

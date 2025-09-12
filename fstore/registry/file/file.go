@@ -3,8 +3,14 @@ package file
 import (
 	"github.com/rytsh/liz/file"
 
-	"github.com/rytsh/mugo/fstore/errors"
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+		return "file", New(o.Trust)
+	})
+}
 
 type File struct {
 	trust bool
@@ -25,7 +31,7 @@ func (f *File) Save(fileName string, data []byte) (bool, error) {
 
 func (f *File) Write(fileName string, data []byte) (bool, error) {
 	if !f.trust {
-		return false, errors.ErrTrustRequired
+		return false, fstore.ErrTrustRequired
 	}
 
 	if err := f.api.SetRaw(fileName, data); err != nil {

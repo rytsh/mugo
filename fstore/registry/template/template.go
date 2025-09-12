@@ -3,7 +3,15 @@ package template
 import (
 	"bytes"
 	"io"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddFuncWithOptions(func(o fstore.Option) (string, any) {
+		return "execTemplate", New(o.Template).ExecTemplate
+	})
+}
 
 type ExecuteTemplate interface {
 	ExecuteTemplate(wr io.Writer, name string, data any) error

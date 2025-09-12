@@ -1,9 +1,5 @@
 package fstore
 
-import (
-	"github.com/rakunlabs/logi/logadapter"
-)
-
 type option struct {
 	disableFuncs   map[string]struct{}
 	disableGroups  map[string]struct{}
@@ -11,15 +7,15 @@ type option struct {
 	specificGroups map[string]struct{}
 
 	trust           bool
-	log             logadapter.Adapter
+	log             Adapter
 	workDir         string
 	executeTemplate ExecuteTemplate
 }
 
-type Option func(option *option)
+type OptionFunc func(option *option)
 
 // WithSpecificFuncs is a option for just enable specific functions.
-func WithSpecificFuncs(specificFuncs ...string) Option {
+func WithSpecificFuncs(specificFuncs ...string) OptionFunc {
 	return func(option *option) {
 		for _, f := range specificFuncs {
 			option.specificFunc[f] = struct{}{}
@@ -30,7 +26,7 @@ func WithSpecificFuncs(specificFuncs ...string) Option {
 // WithSpecificGroups is a option for just enable specific direct add groups.
 //
 //	WithSpecificGroups("sprig")
-func WithSpecificGroups(specificGroups ...string) Option {
+func WithSpecificGroups(specificGroups ...string) OptionFunc {
 	return func(option *option) {
 		for _, f := range specificGroups {
 			option.specificGroups[f] = struct{}{}
@@ -41,7 +37,7 @@ func WithSpecificGroups(specificGroups ...string) Option {
 // WithDisableGroups is a option for disable direct groups.
 //
 //	WithDisableGroups("sprig")
-func WithDisableGroups(disableGroups ...string) Option {
+func WithDisableGroups(disableGroups ...string) OptionFunc {
 	return func(option *option) {
 		for _, g := range disableGroups {
 			option.disableGroups[g] = struct{}{}
@@ -52,7 +48,7 @@ func WithDisableGroups(disableGroups ...string) Option {
 // WithDisableFuncs is a option for disableFuncs.
 //
 //	WithDisableFuncs("exec", "execTemplate")
-func WithDisableFuncs(disableFuncs ...string) Option {
+func WithDisableFuncs(disableFuncs ...string) OptionFunc {
 	return func(option *option) {
 		for _, f := range disableFuncs {
 			option.disableFuncs[f] = struct{}{}
@@ -62,26 +58,26 @@ func WithDisableFuncs(disableFuncs ...string) Option {
 
 // WithTrust is a option for trust.
 // Some functions are not safe to use such as "exec".
-func WithTrust(trust bool) Option {
+func WithTrust(trust bool) OptionFunc {
 	return func(option *option) {
 		option.trust = trust
 	}
 }
 
 // WithWorkDir is a option for workDir.
-func WithWorkDir(workDir string) Option {
+func WithWorkDir(workDir string) OptionFunc {
 	return func(option *option) {
 		option.workDir = workDir
 	}
 }
 
-func WithExecuteTemplate(t ExecuteTemplate) Option {
+func WithExecuteTemplate(t ExecuteTemplate) OptionFunc {
 	return func(option *option) {
 		option.executeTemplate = t
 	}
 }
 
-func WithLog(log logadapter.Adapter) Option {
+func WithLog(log Adapter) OptionFunc {
 	return func(option *option) {
 		option.log = log
 	}

@@ -2,7 +2,13 @@ package time
 
 import (
 	"time"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("time", Time{})
+}
 
 type Time struct{}
 

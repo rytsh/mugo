@@ -7,20 +7,25 @@ import (
 
 	"github.com/cli/safeexec"
 	"github.com/kballard/go-shellquote"
-	"github.com/rakunlabs/logi/logadapter"
 	"github.com/rytsh/liz/shutdown"
 
-	"github.com/rytsh/mugo/fstore/errors"
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+		return "exec", New(o.Trust, o.Log)
+	})
+}
 
 type Exec struct {
 	trust bool
-	log   logadapter.Adapter
+	log   fstore.Adapter
 }
 
-func New(trust bool, log logadapter.Adapter) *Exec {
+func New(trust bool, log fstore.Adapter) *Exec {
 	if log == nil {
-		log = logadapter.Noop{}
+		log = fstore.Noop{}
 	}
 
 	return &Exec{
@@ -29,9 +34,9 @@ func New(trust bool, log logadapter.Adapter) *Exec {
 	}
 }
 
-func (e Exec) Exec(cli string) (map[string]interface{}, error) {
+func (e Exec) Exec(cli string) (map[string]any, error) {
 	if !e.trust {
-		return nil, errors.ErrTrustRequired
+		return nil, fstore.ErrTrustRequired
 	}
 
 	commands, err := shellquote.Split(cli)
@@ -85,7 +90,7 @@ func (e Exec) Exec(cli string) (map[string]interface{}, error) {
 		return nil, err
 	}
 
-	return map[string]interface{}{
+	return map[string]any{
 		"stdout": cmdOutputResult,
 		"stderr": cmdErrorResult,
 		"status": cmd.ProcessState.ExitCode(),

@@ -7,34 +7,31 @@ import (
 
 	"github.com/rytsh/mugo/fstore"
 	"github.com/rytsh/mugo/templatex"
-	"github.com/spf13/cast"
 )
 
-var Template = templatex.New(templatex.WithAddFuncsTpl(fstore.FuncMapTpl(
-	fstore.WithLog(slog.Default()),
-	fstore.WithTrust(true),
-)))
+var template = templatex.New(
+	templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
+		return fstore.FuncMap(
+			fstore.WithLog(slog.Default()),
+			fstore.WithTrust(true),
+			fstore.WithExecuteTemplate(o.T),
+		)
+	}),
+)
 
 var globalRender = Render{
-	template: Template,
+	template: template,
 }
 
 type Render struct {
-	Data     map[string]any
 	template *templatex.Template
 }
 
-func New() Render {
-	return Render{
-		template: Template,
-	}
+func (r *Render) Execute(content string) ([]byte, error) {
+	return r.ExecuteWithData(content, nil)
 }
 
-func (r *Render) Execute(content any) ([]byte, error) {
-	return r.ExecuteWithData(content, r.Data)
-}
-
-func (r *Render) ExecuteWithData(content, data any) ([]byte, error) {
+func (r *Render) ExecuteWithData(content string, data any) ([]byte, error) {
 	if r.template == nil {
 		return nil, errors.New("template is nil")
 	}
@@ -42,7 +39,7 @@ func (r *Render) ExecuteWithData(content, data any) ([]byte, error) {
 	var buf bytes.Buffer
 	if err := r.template.Execute(
 		templatex.WithIO(&buf),
-		templatex.WithContent(cast.ToString(content)),
+		templatex.WithContent(content),
 		templatex.WithData(data),
 	); err != nil {
 		return nil, err
@@ -51,10 +48,10 @@ func (r *Render) ExecuteWithData(content, data any) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func Execute(content any) ([]byte, error) {
+func Execute(content string) ([]byte, error) {
 	return globalRender.Execute(content)
 }
 
-func ExecuteWithData(content, data any) ([]byte, error) {
+func ExecuteWithData(content string, data any) ([]byte, error) {
 	return globalRender.ExecuteWithData(content, data)
 }

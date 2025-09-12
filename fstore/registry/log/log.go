@@ -2,7 +2,13 @@ package log
 
 import (
 	"log/slog"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("log", Log{})
+}
 
 type Log struct{}
 

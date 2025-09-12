@@ -1,10 +1,17 @@
 package templatex
 
+import "maps"
+
+type Option struct {
+	T *Template
+}
+
 type optionsTemplate struct {
-	addFuncs map[string]interface{}
-	fnValue  interface{}
+	addFuncs map[string]any
+	fnValue  any
 
 	isHTMLTemplate bool
+	Opt            Option
 }
 
 type OptionTemplate func(*optionsTemplate)
@@ -16,10 +23,10 @@ func WithHTMLTemplate() OptionTemplate {
 }
 
 // WithAddFuncMap for adding multiple functions.
-func WithAddFuncMap(funcMap map[string]interface{}) OptionTemplate {
+func WithAddFuncMap(funcMap map[string]any) OptionTemplate {
 	return func(o *optionsTemplate) {
 		if o.addFuncs == nil {
-			o.addFuncs = make(map[string]interface{}, len(funcMap))
+			o.addFuncs = make(map[string]any, len(funcMap))
 		}
 
 		for k, v := range funcMap {
@@ -29,48 +36,36 @@ func WithAddFuncMap(funcMap map[string]interface{}) OptionTemplate {
 }
 
 // WithAddFunc for adding a function.
-func WithAddFunc(key string, f interface{}) OptionTemplate {
+func WithAddFunc(key string, f any) OptionTemplate {
 	return func(o *optionsTemplate) {
 		if o.addFuncs == nil {
-			o.addFuncs = make(map[string]interface{}, 1)
+			o.addFuncs = make(map[string]any, 1)
 		}
 
 		o.addFuncs[key] = f
 	}
 }
 
-// WithFnValue for passing a value to the function for WithAddFuncsTpl and WithAddFuncTpl.
-// In templatex, default value is templatex.
-func WithFnValue[T any](fn T) OptionTemplate {
-	return func(o *optionsTemplate) {
-		o.fnValue = fn
+func WithAddFuncWithOpts(fn func(o Option) (string, any)) OptionTemplate {
+	return func(opt *optionsTemplate) {
+		if opt.addFuncs == nil {
+			opt.addFuncs = make(map[string]any, 1)
+		}
+
+		k, v := fn(opt.Opt)
+
+		opt.addFuncs[k] = v
 	}
 }
 
-// WithAddFuncsTpl for adding multiple functions.
-// The function is execute with the value passed to WithFnValue.
-func WithAddFuncsTpl[T any](fn func(T) map[string]interface{}) OptionTemplate {
-	return func(o *optionsTemplate) {
-		funcs := fn(o.fnValue.(T))
+func WithAddFuncMapWithOpts(fn func(o Option) map[string]any) OptionTemplate {
+	return func(opt *optionsTemplate) {
+		funcs := fn(opt.Opt)
 
-		if o.addFuncs == nil {
-			o.addFuncs = make(map[string]interface{}, len(funcs))
+		if opt.addFuncs == nil {
+			opt.addFuncs = make(map[string]any, len(funcs))
 		}
 
-		for k, v := range funcs {
-			o.addFuncs[k] = v
-		}
-	}
-}
-
-// WithAddFuncTpl for adding a function.
-// The function is execute with the value passed to WithFnValue.
-func WithAddFuncTpl[T any](key string, f func(T) interface{}) OptionTemplate {
-	return func(o *optionsTemplate) {
-		if o.addFuncs == nil {
-			o.addFuncs = make(map[string]interface{})
-		}
-
-		o.addFuncs[key] = f(o.fnValue.(T))
+		maps.Copy(opt.addFuncs, funcs)
 	}
 }

@@ -11,6 +11,8 @@ import (
 	"github.com/tdewolff/minify/v2/json"
 	"github.com/tdewolff/minify/v2/svg"
 	"github.com/tdewolff/minify/v2/xml"
+
+	"github.com/rytsh/mugo/fstore"
 )
 
 type Minify struct {
@@ -20,6 +22,10 @@ type Minify struct {
 	html html.Minifier
 	json json.Minifier
 	svg  svg.Minifier
+}
+
+func init() {
+	fstore.AddFunc("minify", New().Minify)
 }
 
 func New() *Minify {

@@ -3,34 +3,34 @@ package mugo_test
 import (
 	"bytes"
 	"fmt"
+	"log"
 
-	"github.com/rs/zerolog/log"
-	"github.com/worldline-go/logz"
+	_ "github.com/rytsh/mugo/fstore/registry"
 
 	"github.com/rytsh/mugo/fstore"
 	"github.com/rytsh/mugo/templatex"
 )
 
 func Example() {
-	tpl := templatex.New(templatex.WithAddFuncsTpl(
-		fstore.FuncMapTpl(
-			fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+	tpl := templatex.New(templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
+		return fstore.FuncMap(
 			fstore.WithTrust(true),
 			fstore.WithWorkDir("."),
-		),
-	))
+			fstore.WithExecuteTemplate(o.T),
+		)
+	}))
 
 	var buf bytes.Buffer
 	err := tpl.Execute(
 		templatex.WithContent("{{.Count}} items are made of {{.Material}}"),
-		templatex.WithData(map[string]interface{}{
+		templatex.WithData(map[string]any{
 			"Count":    3,
 			"Material": "wood",
 		}),
 		templatex.WithIO(&buf),
 	)
 	if err != nil {
-		log.Fatal().Err(err).Msg("failed to execute template")
+		log.Fatalf("failed to execute template: %v", err)
 	}
 
 	fmt.Println(buf.String())

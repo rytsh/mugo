@@ -3,20 +3,26 @@ package maps
 import (
 	"strings"
 	"sync"
+
+	"github.com/rytsh/mugo/fstore"
 )
 
+func init() {
+	fstore.AddStruct("map", New())
+}
+
 type Map struct {
-	value map[string]interface{}
+	value map[string]any
 	mutex sync.RWMutex
 }
 
 func New() *Map {
 	return &Map{
-		value: make(map[string]interface{}),
+		value: make(map[string]any),
 	}
 }
 
-func (m *Map) Set(key string, value interface{}) map[string]interface{} {
+func (m *Map) Set(key string, value any) map[string]any {
 	m.mutex.Lock()
 	defer m.mutex.Unlock()
 
@@ -31,20 +37,20 @@ func (m *Map) Set(key string, value interface{}) map[string]interface{} {
 		}
 
 		if _, ok := hWalk[v]; !ok {
-			hWalk[v] = make(map[string]interface{})
+			hWalk[v] = make(map[string]any)
 		}
 
-		if _, ok := hWalk[v].(map[string]interface{}); !ok {
-			hWalk[v] = make(map[string]interface{})
+		if _, ok := hWalk[v].(map[string]any); !ok {
+			hWalk[v] = make(map[string]any)
 		}
 
-		hWalk = hWalk[v].(map[string]interface{})
+		hWalk = hWalk[v].(map[string]any)
 	}
 
 	return m.value
 }
 
-func (m *Map) Get(key string, data map[string]interface{}) interface{} {
+func (m *Map) Get(key string, data map[string]any) any {
 	m.mutex.RLock()
 	defer m.mutex.RUnlock()
 
@@ -64,7 +70,7 @@ func (m *Map) Get(key string, data map[string]interface{}) interface{} {
 		}
 
 		var ok bool
-		data, ok = data[v].(map[string]interface{})
+		data, ok = data[v].(map[string]any)
 		if !ok {
 			return nil
 		}

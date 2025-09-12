@@ -20,7 +20,7 @@ func TestTemplate_Execute(t *testing.T) {
 		{
 			name: "test template",
 			args: args{
-				v:       map[string]interface{}{"name": "test"},
+				v:       map[string]any{"name": "test"},
 				content: `{{ .name }}`,
 			},
 			want:    "test",
@@ -29,7 +29,7 @@ func TestTemplate_Execute(t *testing.T) {
 		{
 			name: "custom func",
 			args: args{
-				v:       map[string]interface{}{"name": "x"},
+				v:       map[string]any{"name": "x"},
 				content: `{{ custom .name }}`,
 			},
 			opts: []OptionTemplate{WithAddFunc("custom", func(x string) string {

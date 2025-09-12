@@ -6,7 +6,13 @@ import (
 
 	"github.com/shopspring/decimal"
 	"github.com/spf13/cast"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("math", Math{})
+}
 
 type Math struct{}
 
@@ -145,7 +151,7 @@ func (Math) Sign(a any) (int, error) {
 	return aDec.Sign(), nil
 }
 
-func (Math) Round(a any, precision interface{}) (json.Number, error) {
+func (Math) Round(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -159,7 +165,7 @@ func (Math) Round(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.Round(precisionInt).String()), nil
 }
 
-func (Math) RoundBankers(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundBankers(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -173,7 +179,7 @@ func (Math) RoundBankers(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundBank(precisionInt).String()), nil
 }
 
-func (Math) RoundCash(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundCash(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -187,7 +193,7 @@ func (Math) RoundCash(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundCash(precisionUint8).String()), nil
 }
 
-func (Math) RoundCeil(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundCeil(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -201,7 +207,7 @@ func (Math) RoundCeil(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundCeil(precisionInt).String()), nil
 }
 
-func (Math) RoundFloor(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundFloor(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -215,7 +221,7 @@ func (Math) RoundFloor(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundFloor(precisionInt).String()), nil
 }
 
-func (Math) RoundUp(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundUp(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -229,7 +235,7 @@ func (Math) RoundUp(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundUp(precisionInt).String()), nil
 }
 
-func (Math) RoundDown(a any, precision interface{}) (json.Number, error) {
+func (Math) RoundDown(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err
@@ -243,7 +249,7 @@ func (Math) RoundDown(a any, precision interface{}) (json.Number, error) {
 	return json.Number(aDec.RoundDown(precisionInt).String()), nil
 }
 
-func (Math) Truncate(a any, precision interface{}) (json.Number, error) {
+func (Math) Truncate(a any, precision any) (json.Number, error) {
 	aDec, err := convertDecimal(a)
 	if err != nil {
 		return "", err

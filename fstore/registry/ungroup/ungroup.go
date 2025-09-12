@@ -1,7 +1,15 @@
 package ungroup
 
-func Ungroup() map[string]interface{} {
-	return map[string]interface{}{
+import (
+	"github.com/rytsh/mugo/fstore"
+)
+
+func init() {
+	fstore.AddGroup("ungroup", Ungroup)
+}
+
+func Ungroup() map[string]any {
+	return map[string]any{
 		"nothing": Nothing,
 	}
 }

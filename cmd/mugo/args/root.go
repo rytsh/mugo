@@ -18,6 +18,8 @@ import (
 	"github.com/rytsh/liz/shutdown"
 	"github.com/spf13/cobra"
 
+	_ "github.com/rytsh/mugo/fstore/registry"
+
 	"github.com/rytsh/mugo/fstore"
 	"github.com/rytsh/mugo/fstore/registry/random"
 	"github.com/rytsh/mugo/internal/banner"
@@ -64,9 +66,7 @@ var rootCmd = &cobra.Command{
 		if config.App.List {
 			slog.Info("print function list")
 
-			tpl := templatex.New(templatex.WithAddFuncsTpl(
-				FStore(),
-			))
+			tpl := templatex.New(templatex.WithAddFuncMapWithOpts(FStore))
 
 			for _, v := range tpl.ListFuncs() {
 				fmt.Println(v.Description)
@@ -204,9 +204,7 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 		random.DefaultRandom = rand.New(rand.NewSource(config.App.RandomSeed))
 	}
 
-	tpl := templatex.New(templatex.WithAddFuncsTpl(
-		FStore(),
-	)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
+	tpl := templatex.New(templatex.WithAddFuncMapWithOpts(FStore)).SetDelims(config.Checked.Delims[0], config.Checked.Delims[1])
 
 	for _, p := range config.App.Parse {
 		// if p is an http url, we try to download it
@@ -245,12 +243,12 @@ func mugo(ctx context.Context, input []byte, info string) (err error) {
 	}
 
 	// read input data
-	var inputData interface{}
+	var inputData any
 
 	{ // load data
-		var storeData interface{}
+		var storeData any
 		for _, data := range config.App.Data {
-			var currentData interface{}
+			var currentData any
 			var err error
 
 			if config.App.DataRaw {
@@ -357,8 +355,8 @@ func ReadAll(r io.Reader) (string, error) {
 	return string(content), nil
 }
 
-func FStore() func(t fstore.ExecuteTemplate) map[string]interface{} {
-	return fstore.FuncMapTpl(
+func FStore(opt templatex.Option) map[string]any {
+	return fstore.FuncMap(
 		fstore.WithSpecificGroups(config.App.SpecificGroups...),
 		fstore.WithSpecificFuncs(config.App.SpecificFuncs...),
 		fstore.WithDisableGroups(config.App.DisabledGroups...),
@@ -367,5 +365,6 @@ func FStore() func(t fstore.ExecuteTemplate) map[string]interface{} {
 		fstore.WithLog(slog.Default()),
 		fstore.WithTrust(config.App.Trust),
 		fstore.WithWorkDir(config.Checked.WorkDir),
+		fstore.WithExecuteTemplate(opt.T),
 	)
 }

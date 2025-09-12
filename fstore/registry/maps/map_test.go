@@ -8,13 +8,13 @@ import (
 func Test_hold(t *testing.T) {
 	type args struct {
 		key   string
-		value interface{}
+		value any
 	}
 	tests := []struct {
 		name string
 		args args
-		hold map[string]interface{}
-		want map[string]interface{}
+		hold map[string]any
+		want map[string]any
 	}{
 		{
 			name: "hold",
@@ -22,7 +22,7 @@ func Test_hold(t *testing.T) {
 				key:   "key",
 				value: "value",
 			},
-			want: map[string]interface{}{
+			want: map[string]any{
 				"key": "value",
 			},
 		},
@@ -32,9 +32,9 @@ func Test_hold(t *testing.T) {
 				key:   "key/nested/x",
 				value: "value",
 			},
-			want: map[string]interface{}{
-				"key": map[string]interface{}{
-					"nested": map[string]interface{}{
+			want: map[string]any{
+				"key": map[string]any{
+					"nested": map[string]any{
 						"x": "value",
 					},
 				},
@@ -46,15 +46,15 @@ func Test_hold(t *testing.T) {
 				key:   "key/nested/x",
 				value: "value",
 			},
-			hold: map[string]interface{}{
-				"key": map[string]interface{}{
+			hold: map[string]any{
+				"key": map[string]any{
 					"nested": "value",
 					"foo":    "bar",
 				},
 			},
-			want: map[string]interface{}{
-				"key": map[string]interface{}{
-					"nested": map[string]interface{}{
+			want: map[string]any{
+				"key": map[string]any{
+					"nested": map[string]any{
 						"x": "value",
 					},
 					"foo": "bar",
@@ -65,7 +65,7 @@ func Test_hold(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if tt.hold == nil {
-				tt.hold = make(map[string]interface{})
+				tt.hold = make(map[string]any)
 			}
 
 			m := Map{value: tt.hold}
@@ -80,19 +80,19 @@ func Test_hold(t *testing.T) {
 func TestGetData(t *testing.T) {
 	type args struct {
 		key  string
-		data map[string]interface{}
-		hold map[string]interface{}
+		data map[string]any
+		hold map[string]any
 	}
 	tests := []struct {
 		name string
 		args args
-		want interface{}
+		want any
 	}{
 		{
 			name: "get data",
 			args: args{
 				key: "key",
-				data: map[string]interface{}{
+				data: map[string]any{
 					"key": "value",
 				},
 			},
@@ -109,9 +109,9 @@ func TestGetData(t *testing.T) {
 			name: "get nested data",
 			args: args{
 				key: "key/nested/x",
-				data: map[string]interface{}{
-					"key": map[string]interface{}{
-						"nested": map[string]interface{}{
+				data: map[string]any{
+					"key": map[string]any{
+						"nested": map[string]any{
 							"x": "value",
 						},
 					},
@@ -123,9 +123,9 @@ func TestGetData(t *testing.T) {
 			name: "unknown key",
 			args: args{
 				key: "key/nested/y",
-				data: map[string]interface{}{
-					"key": map[string]interface{}{
-						"nested": map[string]interface{}{
+				data: map[string]any{
+					"key": map[string]any{
+						"nested": map[string]any{
 							"x": "value",
 						},
 					},
@@ -137,9 +137,9 @@ func TestGetData(t *testing.T) {
 			name: "from hold",
 			args: args{
 				key: "key/nested/y",
-				hold: map[string]interface{}{
-					"key": map[string]interface{}{
-						"nested": map[string]interface{}{
+				hold: map[string]any{
+					"key": map[string]any{
+						"nested": map[string]any{
 							"y": "value",
 						},
 					},

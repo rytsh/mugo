@@ -2,7 +2,7 @@ package fstore
 
 type valuer struct {
 	Opt   option
-	Value map[string]interface{}
+	Value map[string]any
 }
 
 func (s *valuer) addFunc(name string, fn any) {
@@ -17,7 +17,7 @@ func (s *valuer) addFunc(name string, fn any) {
 	s.Value[name] = fn
 }
 
-func (s *valuer) addGroup(name string, fn func() map[string]interface{}) {
+func (s *valuer) addGroup(name string, fn func() map[string]any) {
 	if !isEnable(name, s.Opt, true) {
 		return
 	}

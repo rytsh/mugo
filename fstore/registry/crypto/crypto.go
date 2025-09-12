@@ -14,13 +14,19 @@ import (
 
 	"github.com/golang-jwt/jwt/v5"
 	"github.com/spf13/cast"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("crypto", Crypto{})
+}
 
 type Crypto struct{}
 
 var defaultJWTParser = jwt.NewParser()
 
-func (Crypto) JwtParseUnverified(token string) (map[string]interface{}, error) {
+func (Crypto) JwtParseUnverified(token string) (map[string]any, error) {
 	claims := jwt.MapClaims{}
 
 	_, _, err := defaultJWTParser.ParseUnverified(token, claims)
@@ -111,7 +117,7 @@ func (Crypto) FNV32a(v any) (int, error) {
 	return int(algorithm.Sum32()), nil
 }
 
-func (Crypto) HMAC(h interface{}, k interface{}, m interface{}) (string, error) {
+func (Crypto) HMAC(h any, k any, m any) (string, error) {
 	ha, err := cast.ToStringE(h)
 	if err != nil {
 		return "", err

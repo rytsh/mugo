@@ -8,7 +8,7 @@ import (
 
 func TestFuncInfos(t *testing.T) {
 	type args struct {
-		fns map[string]interface{}
+		fns map[string]any
 	}
 	tests := []struct {
 		name string
@@ -18,9 +18,9 @@ func TestFuncInfos(t *testing.T) {
 		{
 			name: "TestFuncInfos",
 			args: args{
-				fns: map[string]interface{}{
-					"uint64": func(v interface{}) uint64 { return 0 },
-					"test":   func(v interface{}) (uint64, error) { return 0, nil },
+				fns: map[string]any{
+					"uint64": func(v any) uint64 { return 0 },
+					"test":   func(v any) (uint64, error) { return 0, nil },
 				},
 			},
 			want: []Info{

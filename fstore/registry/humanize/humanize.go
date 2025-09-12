@@ -5,7 +5,13 @@ import (
 	"time"
 
 	"github.com/dustin/go-humanize"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("humanize", Humanize{})
+}
 
 // Humanize is a collection of humanize github.com/dustin/go-humanize functions.
 type Humanize struct{}

@@ -8,7 +8,13 @@ import (
 	"github.com/BurntSushi/toml"
 	"github.com/gomarkdown/markdown"
 	"gopkg.in/yaml.v3"
+
+	"github.com/rytsh/mugo/fstore"
 )
+
+func init() {
+	fstore.AddStruct("codec", Codec{})
+}
 
 type Codec struct{}
 

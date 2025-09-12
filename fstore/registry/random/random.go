@@ -1,17 +1,22 @@
 package random
 
 import (
+	"math/rand"
 	"time"
 
-	"math/rand"
-
 	"github.com/Masterminds/goutils"
+
+	"github.com/rytsh/mugo/fstore"
 )
 
 var DefaultRandom = rand.New(rand.NewSource(time.Now().UnixNano()))
 
 func SetDefaultRandomSeed(seed int64) {
 	DefaultRandom.Seed(seed)
+}
+
+func init() {
+	fstore.AddStruct("random", New(nil))
 }
 
 type Random struct {

@@ -8,11 +8,19 @@ import (
 
 	"github.com/spf13/afero"
 	"github.com/spf13/cast"
+
+	"github.com/rytsh/mugo/fstore"
 )
 
 type Os struct {
 	workFs  afero.Fs
 	workDir string
+}
+
+func init() {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+		return "os", New(o.WorkDir)
+	})
 }
 
 func New(workDir string) *Os {

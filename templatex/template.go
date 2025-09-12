@@ -17,7 +17,7 @@ type Template struct {
 	templateParsed templateInf
 
 	mutex sync.RWMutex
-	funcs map[string]interface{}
+	funcs map[string]any
 
 	isHTMLTemplate bool
 }
@@ -26,18 +26,16 @@ type Template struct {
 func New(opts ...OptionTemplate) *Template {
 	tpl := &Template{}
 
-	optsNew := make([]OptionTemplate, 0, len(opts)+1)
-	optsNew = append(optsNew, WithFnValue(tpl))
-	optsNew = append(optsNew, opts...)
-
-	option := &optionsTemplate{}
-	for _, opt := range optsNew {
+	option := &optionsTemplate{
+		Opt: Option{T: tpl},
+	}
+	for _, opt := range opts {
 		opt(option)
 	}
 
 	tpl.isHTMLTemplate = option.isHTMLTemplate
 	tpl.template = newTemplateX(DefaultTemplateName, tpl.isHTMLTemplate)
-	tpl.funcs = make(map[string]interface{}, len(option.addFuncs))
+	tpl.funcs = make(map[string]any, len(option.addFuncs))
 
 	tpl.AddFuncMap(
 		option.addFuncs,
@@ -115,7 +113,7 @@ func (t *Template) AddFuncMap(funcMap map[string]any) {
 }
 
 // AddFunc for adding a func to the template.
-func (t *Template) AddFunc(name string, fn interface{}) {
+func (t *Template) AddFunc(name string, fn any) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
