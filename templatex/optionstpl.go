@@ -8,10 +8,9 @@ type Option struct {
 
 type optionsTemplate struct {
 	addFuncs map[string]any
-	fnValue  any
 
 	isHTMLTemplate bool
-	Opt            Option
+	opt            Option
 }
 
 type OptionTemplate func(*optionsTemplate)
@@ -52,7 +51,7 @@ func WithAddFuncWithOpts(fn func(o Option) (string, any)) OptionTemplate {
 			opt.addFuncs = make(map[string]any, 1)
 		}
 
-		k, v := fn(opt.Opt)
+		k, v := fn(opt.opt)
 
 		opt.addFuncs[k] = v
 	}
@@ -60,7 +59,7 @@ func WithAddFuncWithOpts(fn func(o Option) (string, any)) OptionTemplate {
 
 func WithAddFuncMapWithOpts(fn func(o Option) map[string]any) OptionTemplate {
 	return func(opt *optionsTemplate) {
-		funcs := fn(opt.Opt)
+		funcs := fn(opt.opt)
 
 		if opt.addFuncs == nil {
 			opt.addFuncs = make(map[string]any, len(funcs))

@@ -27,7 +27,7 @@ func New(opts ...OptionTemplate) *Template {
 	tpl := &Template{}
 
 	option := &optionsTemplate{
-		Opt: Option{T: tpl},
+		opt: Option{T: tpl},
 	}
 	for _, opt := range opts {
 		opt(option)

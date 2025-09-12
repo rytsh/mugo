@@ -58,7 +58,7 @@ Flags:
 
 ## Example
 
-Read all folder and generate info json seperately:
+Cow-say example:
 
 ```sh
 mugo -s -r -d "Moo-ve over" https://github.com/rytsh/mugo/raw/main/data/templates/cow.tpl
