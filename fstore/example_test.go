@@ -6,6 +6,8 @@ import (
 	"log"
 	"text/template"
 
+	_ "github.com/rytsh/mugo/fstore/registry"
+
 	"github.com/rytsh/mugo/fstore"
 )
 
