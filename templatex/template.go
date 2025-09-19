@@ -37,9 +37,7 @@ func New(opts ...OptionTemplate) *Template {
 	tpl.template = newTemplateX(DefaultTemplateName, tpl.isHTMLTemplate)
 	tpl.funcs = make(map[string]any, len(option.addFuncs))
 
-	tpl.AddFuncMap(
-		option.addFuncs,
-	)
+	tpl.AddFuncMap(option.addFuncs)
 
 	return tpl
 }
@@ -105,9 +103,7 @@ func (t *Template) AddFuncMap(funcMap map[string]any) {
 	t.mutex.Lock()
 	defer t.mutex.Unlock()
 
-	for k, v := range funcMap {
-		t.funcs[k] = v
-	}
+	maps.Copy(t.funcs, funcMap)
 
 	t.template.Funcs(funcMap)
 }
@@ -233,6 +229,8 @@ func (t *Template) Execute(opts ...OptionExecute) error {
 		if err != nil {
 			return fmt.Errorf("execute parse error: %w", err)
 		}
+
+		t.templateParsed = parsedTpl
 	}
 
 	// Execute the template and write the output to the buffer

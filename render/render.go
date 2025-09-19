@@ -4,27 +4,35 @@ import (
 	"bytes"
 	"errors"
 	"log/slog"
+	"sync"
 
 	"github.com/rytsh/mugo/fstore"
 	"github.com/rytsh/mugo/templatex"
 )
 
-var template = templatex.New(
-	templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
-		return fstore.FuncMap(
-			fstore.WithLog(slog.Default()),
-			fstore.WithTrust(true),
-			fstore.WithExecuteTemplate(o.T),
-		)
-	}),
+var (
+	globalRender *Render
+	once         sync.Once
 )
-
-var globalRender = Render{
-	template: template,
-}
 
 type Render struct {
 	template *templatex.Template
+}
+
+func NewRender(opts ...fstore.OptionFunc) *Render {
+	return &Render{
+		template: templatex.New(
+			templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
+				options := append([]fstore.OptionFunc{
+					fstore.WithLog(slog.Default()),
+					fstore.WithTrust(true),
+					fstore.WithExecuteTemplate(o.T),
+				}, opts...)
+
+				return fstore.FuncMap(options...)
+			}),
+		),
+	}
 }
 
 func (r *Render) Execute(content string) ([]byte, error) {
@@ -49,9 +57,17 @@ func (r *Render) ExecuteWithData(content string, data any) ([]byte, error) {
 }
 
 func Execute(content string) ([]byte, error) {
+	once.Do(func() {
+		globalRender = NewRender()
+	})
+
 	return globalRender.Execute(content)
 }
 
 func ExecuteWithData(content string, data any) ([]byte, error) {
+	once.Do(func() {
+		globalRender = NewRender()
+	})
+
 	return globalRender.ExecuteWithData(content, data)
 }

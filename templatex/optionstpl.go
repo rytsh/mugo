@@ -48,7 +48,7 @@ func WithAddFunc(key string, f any) OptionTemplate {
 func WithAddFuncWithOpts(fn func(o Option) (string, any)) OptionTemplate {
 	return func(opt *optionsTemplate) {
 		if opt.addFuncs == nil {
-			opt.addFuncs = make(map[string]any, 1)
+			opt.addFuncs = make(map[string]any)
 		}
 
 		k, v := fn(opt.opt)
