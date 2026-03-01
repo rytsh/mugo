@@ -35,39 +35,50 @@ func NewRender(opts ...fstore.OptionFunc) *Render {
 	}
 }
 
-func (r *Render) Execute(content string) ([]byte, error) {
-	return r.ExecuteWithData(content, nil)
+func (r *Render) Execute(content string, opts ...templatex.OptionExecute) ([]byte, error) {
+	return r.executeWith(content, nil, opts...)
 }
 
-func (r *Render) ExecuteWithData(content string, data any) ([]byte, error) {
+func (r *Render) ExecuteWithData(content string, data any, opts ...templatex.OptionExecute) ([]byte, error) {
+	return r.executeWith(content, data, opts...)
+}
+
+// ExecuteWith executes the template with data and optional execution options.
+// Extra options are passed directly to templatex.Execute, allowing per-execution
+// functions via templatex.WithExecFunc or templatex.WithExecFuncMap.
+func (r *Render) executeWith(content string, data any, opts ...templatex.OptionExecute) ([]byte, error) {
 	if r.template == nil {
 		return nil, errors.New("template is nil")
 	}
 
 	var buf bytes.Buffer
-	if err := r.template.Execute(
+
+	execOpts := append([]templatex.OptionExecute{
 		templatex.WithIO(&buf),
 		templatex.WithContent(content),
 		templatex.WithData(data),
-	); err != nil {
+	}, opts...)
+
+	if err := r.template.Execute(execOpts...); err != nil {
 		return nil, err
 	}
 
 	return buf.Bytes(), nil
 }
 
-func Execute(content string) ([]byte, error) {
+func Execute(content string, opts ...templatex.OptionExecute) ([]byte, error) {
 	once.Do(func() {
 		globalRender = NewRender()
 	})
 
-	return globalRender.Execute(content)
+	return globalRender.Execute(content, opts...)
+
 }
 
-func ExecuteWithData(content string, data any) ([]byte, error) {
+func ExecuteWithData(content string, data any, opts ...templatex.OptionExecute) ([]byte, error) {
 	once.Do(func() {
 		globalRender = NewRender()
 	})
 
-	return globalRender.ExecuteWithData(content, data)
+	return globalRender.ExecuteWithData(content, data, opts...)
 }

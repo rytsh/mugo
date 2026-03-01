@@ -223,6 +223,11 @@ func (t *Template) Execute(opts ...OptionExecute) error {
 		return fmt.Errorf("execute clone error: %w", err)
 	}
 
+	// Apply per-execution functions to the cloned template.
+	if len(o.funcMap) > 0 {
+		tpl.Funcs(o.funcMap)
+	}
+
 	parsedTpl := tpl
 	if !o.parsed {
 		parsedTpl, err = tpl.Parse(o.content)
