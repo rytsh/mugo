@@ -3,7 +3,6 @@
 [![License](https://img.shields.io/github/license/rytsh/mugo?color=red&style=flat-square)](https://raw.githubusercontent.com/rytsh/mugo/main/LICENSE)
 [![Coverage](https://img.shields.io/sonar/coverage/rytsh_mugo?logo=sonarcloud&server=https%3A%2F%2Fsonarcloud.io&style=flat-square)](https://sonarcloud.io/summary/overall?id=rytsh_mugo)
 [![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/rytsh/mugo/test.yml?branch=main&logo=github&style=flat-square&label=ci)](https://github.com/rytsh/mugo/actions)
-[![Go Report Card](https://goreportcard.com/badge/github.com/rytsh/mugo?style=flat-square)](https://goreportcard.com/report/github.com/rytsh/mugo)
 [![Go PKG](https://raw.githubusercontent.com/rakunlabs/.github/main/assets/badges/gopkg.svg)](https://pkg.go.dev/github.com/rytsh/mugo)
 [![Web](https://img.shields.io/badge/web-document-blueviolet?style=flat-square)](https://rytsh.github.io/mugo/)
 
