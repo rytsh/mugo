@@ -1,10 +1,10 @@
 # CLI
 
-mugo accept stdin or file as template and data input.
+Mugo accepts templates and data from command-line values, files, URLs, or standard input.
 
-If you give template with `-t` option than input is data.  
-If you give data with `-d` option than input is template.  
-If you give both template and data than input is ignored.
+The positional argument or standard input is treated as the template by default. When `--template` is set, that value is the template and the positional argument or standard input is treated as data. `--data` supplies data explicitly; when both `--template` and `--data` are set, positional and standard input data are ignored.
+
+Prefix a `--data` or `--template` value with `@` to load it from a local file. Use `--no-at` when a literal value must begin with `@`.
 
 ```
 Usage:
@@ -31,7 +31,7 @@ Flags:
       --html                        use html/template instead
   -k, --insecure                    skip verify ssl certificate
   -l, --list                        function list
-      --log-level string            log level (debug, info, warn, error, fatal, panic), default is info (default "info")
+      --log-level string            log level (debug, info, warn, error), default is info (default "info")
       --no-at                       disable @ prefix for file path
       --no-retry                    disable retry on request
   -n, --no-stdin                    disable stdin input
@@ -40,9 +40,31 @@ Flags:
       --perm-file string            create file permission, default is 0644
       --perm-folder string          create folder permission, default is 0755
       --random-seed int             seed for random function, default is 0 (random by time)
-  -s, --silience                    silience log
+  -s, --silience                    silence log output
   -t, --template string             input template as raw or file path with @ prefix could be file with any extension
       --trust                       trust to execute dangerous functions
   -v, --version                     version for mugo
   -w, --work-dir string             work directory for run template
 ```
+
+## Input data
+
+Without `--data-raw`, inline data is decoded as YAML. JSON is valid YAML, so both formats can be passed directly. Files loaded with the `@` prefix support `.json`, `.yaml`, `.yml`, and `.toml` extensions.
+
+Use `--data-raw` to pass data as a string. Add `--data-raw-byte` to expose file or input data as `[]byte` instead.
+
+Multiple `--data` flags are merged in the order supplied.
+
+## Templates
+
+The positional template may be a local file, an HTTP(S) URL, or `-` for standard input. `--parse` may be repeated to parse additional template definitions before executing the main template.
+
+Use `--html` to switch from `text/template` to `html/template`, and `--delims '<% %>'` to set custom left and right delimiters.
+
+## Output and security
+
+Rendered output is written to standard output unless `--output` is set. `--perm-folder` and `--perm-file` control permissions for newly created output paths.
+
+Functions that execute commands or write files require `--trust`. Keep trust disabled for untrusted templates.
+
+The silence flag is currently spelled `--silience` for CLI compatibility; `-s` is the recommended shorthand.

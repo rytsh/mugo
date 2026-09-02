@@ -1,26 +1,25 @@
 package file
 
 import (
-	"github.com/rytsh/liz/file"
-
 	"github.com/rytsh/mugo/fstore"
+	internalfile "github.com/rytsh/mugo/internal/file"
 )
 
 func init() {
-	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, *File) {
 		return "file", New(o.Trust)
 	})
 }
 
 type File struct {
 	trust bool
-	api   *file.API
+	api   *internalfile.API
 }
 
 func New(trust bool) *File {
 	return &File{
 		trust: trust,
-		api:   file.New(),
+		api:   internalfile.New(),
 	}
 }
 

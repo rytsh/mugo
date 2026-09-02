@@ -7,7 +7,7 @@
 [![Go PKG](https://raw.githubusercontent.com/rakunlabs/.github/main/assets/badges/gopkg.svg)](https://pkg.go.dev/github.com/rytsh/mugo)
 [![Web](https://img.shields.io/badge/web-document-blueviolet?style=flat-square)](https://rytsh.github.io/mugo/)
 
-Lightweight template executor. It is written in go and uses the [go template](https://golang.org/pkg/text/template/) package to render the templates.
+Lightweight template executor written in Go. It uses the [text/template](https://pkg.go.dev/text/template) package to render templates.
 
 Inspired by [hugo](https://gohugo.io/) to run small workflows.
 
@@ -40,7 +40,7 @@ Flags:
       --html                        use html/template instead
   -k, --insecure                    skip verify ssl certificate
   -l, --list                        function list
-      --log-level string            log level (debug, info, warn, error, fatal, panic), default is info (default "info")
+      --log-level string            log level (debug, info, warn, error), default is info (default "info")
       --no-at                       disable @ prefix for file path
       --no-retry                    disable retry on request
   -n, --no-stdin                    disable stdin input
@@ -49,7 +49,7 @@ Flags:
       --perm-file string            create file permission, default is 0644
       --perm-folder string          create folder permission, default is 0755
       --random-seed int             seed for random function, default is 0 (random by time)
-  -s, --silience                    silience log
+  -s, --silience                    silence log output
   -t, --template string             input template as raw or file path with @ prefix could be file with any extension
       --trust                       trust to execute dangerous functions
   -v, --version                     version for mugo
@@ -61,18 +61,18 @@ Flags:
 Cow-say example:
 
 ```sh
-mugo -s -r -d "Moo-ve over" https://github.com/rytsh/mugo/raw/main/data/templates/cow.tpl
+mugo -s -r -d "Moo-ve over" https://raw.githubusercontent.com/rytsh/mugo/main/data/templates/cow.tpl
 ```
 
-### Development
+## Development
 
 <details><summary>Build</summary>
 
-Get binary with the goreleaser
+Build the binary with GoReleaser:
 
 ```sh
 make build
-# goreleaser build --snapshot --rm-dist --single-target
+# goreleaser build --snapshot --clean --single-target
 ```
 
 </details>
@@ -80,9 +80,9 @@ make build
 <details><summary>Example</summary>
 
 ```sh
-go run cmd/mugo/main.go -r -d "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
-go run cmd/mugo/main.go --trust -d '{"dir":"testdata","url":"http://localhost:5501"}'  -w "." - < testdata/readSeparate.tpl
-go run cmd/mugo/main.go --trust -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}'  -w "." data/templates/folderInfo.tpl
+go run ./cmd/mugo -r -d "." -p 'testdata/tpl/*.tpl' - < testdata/readStart.tpl > output.json
+go run ./cmd/mugo --trust -d '{"dir":"testdata","url":"http://localhost:5501"}' -w "." - < testdata/readSeparate.tpl
+go run ./cmd/mugo --trust -d '{"dir":"testdata","url":"http://localhost:5501", "output":"output"}' -w "." data/templates/folderInfo.tpl
 ```
 
 </details>

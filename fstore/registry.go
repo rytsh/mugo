@@ -39,11 +39,11 @@ func (r *registry) AddGroupWithOptions(fn func(o Option) (string, func() map[str
 	r.GroupsWithOptions = append(r.GroupsWithOptions, fn)
 }
 
-func AddStruct(name string, s any) {
+func AddStruct[T any](name string, s T) {
 	reg.AddFunc(name, returnWithFn(s))
 }
 
-func AddStructWithOptions(fn func(o Option) (string, any)) {
+func AddStructWithOptions[T any](fn func(o Option) (string, T)) {
 	wrapfn := func(o Option) (string, any) {
 		name, s := fn(o)
 		return name, returnWithFn(s)

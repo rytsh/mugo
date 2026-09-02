@@ -1,25 +1,36 @@
-# templateX
+# templatex
 
-templateX is a go template engine with some extra features.
+`templatex` wraps Go's text and HTML template packages with reusable parsing and execution options.
 
-```sh
-import "github.com/rytsh/mugo/templatex"
+```go
+import (
+	"bytes"
+	"fmt"
+	"log"
+	"strings"
+
+	"github.com/rytsh/mugo/templatex"
+)
 ```
 
 ## Usage
 
 ```go
-tpl := templatex.New(store.WithAddFuncsTpl(
-	fstore.FuncMapTpl(
-		fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
-		fstore.WithTrust(true),
-		fstore.WithWorkDir("."),
-	),
-))
+tpl := templatex.New(
+	templatex.WithAddFunc("upper", strings.ToUpper),
+)
 
-tpl.Execute(
-	templatex.WithIO(output),
-	templatex.WithData(inputData),
-	templatex.WithParsed(true),
-);
+var output bytes.Buffer
+if err := tpl.Execute(
+	templatex.WithIO(&output),
+	templatex.WithContent(`Hello {{ upper .Name }}`),
+	templatex.WithData(map[string]any{"Name": "mugo"}),
+); err != nil {
+	log.Fatal(err)
+}
+
+fmt.Println(output.String())
+// Output: Hello MUGO
 ```
+
+Use `WithHTMLTemplate()` when automatic HTML escaping is required. Functions can also be added per execution with `WithExecFunc` or `WithExecFuncMap`.

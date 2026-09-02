@@ -6,42 +6,42 @@ To see the details of Go template, please refer to the official document: [https
 
 ## Use examples with mugo
 
-With `mugo` we can use directly giveing values on commandline to run simple templates.
+With `mugo`, values can be passed directly on the command line to render simple templates.
 
 ```sh
 mugo -s -d '{"name": "mugo"}' - <<< "{{.name}}"
 ```
 
-Or we write template and stop stdin with `ctrl+d`.
+Alternatively, enter a template interactively and finish standard input with `Ctrl+D`.
 
 ```sh
 mugo -d '{"name": "mugo"}' -
 ```
 
-But for more complex templates files are better option for now.
+Template files are a better option for more complex content.
 
-This is a `values.yaml` file
+This is a `values.yaml` file:
 
 ```yaml
 name: mugo
 ```
 
-And this is our template file `name.tpl`
+This is the template file `name.tpl`:
 
 ```tpl
 {{ .name }}
 ```
 
-To run with `mugo`
+Render it with `mugo`:
 
 ```sh
-mugo -s -d @values.yaml -t @name.tpl
-#mugo
+$ mugo -s -d @values.yaml -t @name.tpl
+mugo
 ```
 
-Log output is move to stderr and template output is moved to stdout.
+Log output is written to standard error and rendered template output is written to standard output.
 
-When we redirect to file, we use redirection or `-o` flag.
+Use shell redirection or `--output` to write the result to a file.
 
 ```sh
 mugo -d @values.yaml name.tpl -o name.txt

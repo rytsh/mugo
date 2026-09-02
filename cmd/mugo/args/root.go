@@ -13,9 +13,7 @@ import (
 
 	"github.com/rakunlabs/into"
 	"github.com/rakunlabs/logi"
-	"github.com/rytsh/liz/file"
-	"github.com/rytsh/liz/mapx"
-	"github.com/rytsh/liz/shutdown"
+	"github.com/rakunlabs/mapx"
 	"github.com/spf13/cobra"
 
 	_ "github.com/rytsh/mugo/fstore/registry"
@@ -24,7 +22,9 @@ import (
 	"github.com/rytsh/mugo/fstore/registry/random"
 	"github.com/rytsh/mugo/internal/banner"
 	"github.com/rytsh/mugo/internal/config"
+	"github.com/rytsh/mugo/internal/file"
 	"github.com/rytsh/mugo/internal/request"
+	"github.com/rytsh/mugo/internal/shutdown"
 	"github.com/rytsh/mugo/templatex"
 )
 

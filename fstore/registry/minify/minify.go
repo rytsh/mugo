@@ -30,7 +30,7 @@ func init() {
 
 func New() *Minify {
 	return &Minify{
-		css: css.Minifier{KeepCSS2: true, Precision: 0},
+		css: css.Minifier{Version: 2, Precision: 0},
 		js:  js.Minifier{},
 		xml: xml.Minifier{KeepWhitespace: false},
 		html: html.Minifier{

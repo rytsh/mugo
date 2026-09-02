@@ -97,11 +97,11 @@ func extractDescription(name string, reflectFnTypeOrg reflect.Type, infoMap map[
 		if reflectFnParams > 0 {
 			for i := skipArg; i < reflectFnParams; i++ {
 				if reflectFnType.IsVariadic() && i == reflectFnParams-1 {
-					lineDescription.WriteString("..." + reflectFnType.In(i).Elem().String())
+					lineDescription.WriteString("..." + displayType(reflectFnType.In(i).Elem()))
 					continue
 				}
 
-				lineDescription.WriteString(reflectFnType.In(i).String())
+				lineDescription.WriteString(displayType(reflectFnType.In(i)))
 				if i < reflectFnParams-1 {
 					lineDescription.WriteString(", ")
 				}
@@ -122,7 +122,7 @@ func extractDescription(name string, reflectFnTypeOrg reflect.Type, infoMap map[
 			for i := range reflectFnResults {
 				out := reflectFnType.Out(i)
 				outKind := out.Kind()
-				outStr := out.String()
+				outStr := displayType(out)
 				outStrTrim := strings.TrimPrefix(outStr, "*")
 
 				lineDescription.WriteString(outStr)
@@ -203,6 +203,10 @@ func extractDescription(name string, reflectFnTypeOrg reflect.Type, infoMap map[
 	}
 
 	return description.String()
+}
+
+func displayType(t reflect.Type) string {
+	return strings.ReplaceAll(t.String(), "interface {}", "any")
 }
 
 func strCut(s string) string {

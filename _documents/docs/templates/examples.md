@@ -1,6 +1,6 @@
 # Core Functionality
 
-Before to check examples, we need to know about comments and whitespace.
+Before using the examples, it helps to understand comments and whitespace handling.
 
 ```tpl
 {{/* a comment */}}
@@ -27,7 +27,7 @@ Merhaba dünya!
 
 ## Variables
 
-Inside of template, we can use variables. Variables are defined by __$variableName := value__ syntax.
+Templates can define variables with the `$variableName := value` syntax.
 
 ```tpl
 {{ $x := "Merhaba" -}}
@@ -41,7 +41,7 @@ Merhaba dünya!
 ```
 
 
-## For loop
+## Range
 
 If you have a list of items, you can iterate over them using the `range` function.
 
@@ -67,9 +67,9 @@ Range of list
 
 ```
 
-If we want to for loop with a map, in that time $index is a key of map and $element is a value of map.
+When ranging over a map, `$index` is the key and `$element` is the value.
 
-We can also use `range` to count up to a number. But we need to use `until` function and it's a part of `sprig` functions. Mugo has a `sprig` function set by default so we can use it.
+The Sprig `until` function can generate an integer slice for a numeric range. Sprig functions are enabled by default.
 
 ```tpl
 Count up to 5
@@ -92,7 +92,7 @@ Count up to 5
 
 ## If statement
 
-Binary check functions `eq`, `ne`, `lt`, `le`, `gt`, `ge` but arguments should comparable types and result is boolean.
+The comparison functions `eq`, `ne`, `lt`, `le`, `gt`, and `ge` return booleans. Their arguments must have compatible types.
 
 ```yaml
 result: 10
@@ -136,7 +136,11 @@ First item of list: item-1
 
 ## Define
 
-We can use define to define a template and use it later with `template` function and giving variables.
+Use `define` to create a named template and `template` to execute it with data.
+
+```yaml
+name: mugo
+```
 
 ```tpl
 {{- define "hello" -}}
@@ -149,12 +153,12 @@ Hello {{ .name }}
 Output:
 
 ```txt
-Merhaba dünya!
+Hello mugo
 ```
 
 ## With
 
-Use with to limit the scope of a variable inside of a template.
+Use `with` to limit the scope of a value inside a template.
 
 If `name` value is empty, it will not print anything.
 
@@ -180,7 +184,7 @@ Some useful examples with templates.
 
 ## Sum of variables
 
-`addf` function is a part of `sprig` functions. It uses decimal library to calculate floating point numbers.
+`addf` is provided by Sprig and adds floating-point values.
 
 ```yaml
 values:

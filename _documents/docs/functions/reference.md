@@ -1,16 +1,18 @@
 # Reference
 
+See [Function Examples](/functions/examples.md) for templates and outputs exercised by the Go test suite.
+
 ## ungrouped functions
 
-### exec(string) (map[string]interface {}, error)
+### exec.Exec(string) (map[string]interface {}, error)
 
 Trust required function.
 
 ```tpl
-{{ exec "echo 'Hello World'" }}
+{{ exec.Exec "echo 'Hello World'" }}
 ```
 
-Output: `map[stdout:Hello World]`
+The returned map contains:
 
 ```
 stdout []byte
@@ -612,9 +614,12 @@ Functions of [github.com/jaswdr/faker](https://github.com/jaswdr/faker) package.
 
 ## file
 
-Trust required!
+Writing requires trust; reading does not.
 
 ### file.Save(fileName string, data []byte) (bool, error)
+
+Deprecated alias for `file.Write`.
+
 ### file.Write(fileName string, data []byte) (bool, error)
 ### file.Read(fileName string) ([]byte, error)
 
@@ -651,17 +656,17 @@ Functions of [github.com/dustin/go-humanize](https://github.com/dustin/go-humani
 
 ## log
 
-Before to use log functions, you need to give a logger when initialize `fstore` functions.
+Pass a logger that implements `fstore.Adapter` when initializing the function map.
 
-Example of zerolog usage:
+The standard library's `slog.Logger` implements this interface:
 
 ```go
 fstore.FuncMap(
-	fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
+	fstore.WithLog(slog.Default()),
 )
 ```
 
-Arguments should be support `Adapter` interface.
+Custom loggers must implement `Adapter`:
 
 ```go
 type Adapter interface {
@@ -683,6 +688,16 @@ Log functions return the same value (...interface{} part) as input.
 
 ### map.Set(key string, value interface{}) map[string]interface{}
 ### map.Get(key string, data map[string]interface{}) interface{}
+
+## minify
+
+### minify(kind string, data []byte) ([]byte, error)
+
+Supported kinds are `css`, `html`, `js`, `json`, `svg`, and `xml`.
+
+```tpl
+{{ codec.ByteToString (minify "json" (codec.StringToByte `{ "name": "mugo" }`)) }}
+```
 
 ## os
 

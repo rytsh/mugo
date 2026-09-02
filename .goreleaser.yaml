@@ -10,13 +10,9 @@ git:
 
 release:
   header: |
-    Get the latest release with brew or binary:
+    Download the latest release binary:
 
     ```sh
-    # brew tap brew-tools/tap
-    brew install mugo
-    # or binary download
-    # curl -fSL https://github.com/rytsh/mugo/releases/latest/download/mugo_Linux_x86_64.tar.gz | tar -xz --overwrite -C ~/bin/ mugo
     curl -fSL https://github.com/rytsh/mugo/releases/download/{{ .Tag }}/mugo_Linux_x86_64.tar.gz | tar -xz --overwrite -C ~/bin/ mugo
     ```
   footer: |
@@ -84,13 +80,3 @@ changelog:
       order: 400
     - title: Other work
       order: 9999
-
-brews:
-- name: mugo
-  homepage: https://github.com/rytsh/mugo
-  description: "go template executor"
-  repository:
-    owner: brew-tools
-    name: homebrew-tap
-    token: "{{ .Env.BREW_TOKEN }}"
-  directory: Formula

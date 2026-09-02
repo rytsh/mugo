@@ -18,7 +18,7 @@ type Os struct {
 }
 
 func init() {
-	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, *Os) {
 		return "os", New(o.WorkDir)
 	})
 }

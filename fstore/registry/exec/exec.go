@@ -7,13 +7,13 @@ import (
 
 	"github.com/cli/safeexec"
 	"github.com/kballard/go-shellquote"
-	"github.com/rytsh/liz/shutdown"
 
 	"github.com/rytsh/mugo/fstore"
+	"github.com/rytsh/mugo/internal/shutdown"
 )
 
 func init() {
-	fstore.AddStructWithOptions(func(o fstore.Option) (string, any) {
+	fstore.AddStructWithOptions(func(o fstore.Option) (string, *Exec) {
 		return "exec", New(o.Trust, o.Log)
 	})
 }

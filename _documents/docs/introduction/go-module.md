@@ -1,6 +1,6 @@
 # Use in Go
 
-Mugo's internal template runner and functions are available as a Go package.
+Mugo's template runner, function registry, and renderer are available as Go packages.
 
 ## templatex
 
@@ -10,7 +10,7 @@ Mugo's internal template runner and functions are available as a Go package.
 go get github.com/rytsh/mugo
 ```
 
-```sh
+```go
 import "github.com/rytsh/mugo/templatex"
 ```
 
@@ -49,7 +49,7 @@ fmt.Printf("%s", output.String())
 
 ## fstore
 
-`fstore` is a package that provides bunch of functions with options.
+`fstore` provides an opt-in registry of template functions with filtering, trust, logging, and working-directory options.
 
 ```sh
 go get github.com/rytsh/mugo
@@ -59,7 +59,7 @@ go get github.com/rytsh/mugo
 import (
 	_ "github.com/rytsh/mugo/fstore/registry"
 
-    "github.com/rytsh/mugo/fstore"
+	"github.com/rytsh/mugo/fstore"
 )
 ```
 
@@ -67,7 +67,7 @@ import (
 
 Check details in go document: [https://pkg.go.dev/github.com/rytsh/mugo/fstore](https://pkg.go.dev/github.com/rytsh/mugo/fstore)
 
-fstore's functions not enabled by default and you need to import the registry package or you can import some packages under fstore/registry.
+Functions are not registered by default. Blank-import the complete registry or selected packages under `fstore/registry`.
 
 ```go
 import _ "github.com/rytsh/mugo/fstore/registry"
@@ -112,35 +112,61 @@ fmt.Printf("%s", output)
 // Hatay
 ```
 
-# Use fstore with templatex
+## Use fstore with templatex
 
 `fstore` and `templatex` can be used together.
 Use the tpl to execute templates.
 
 ```go
 tpl := templatex.New(templatex.WithAddFuncMapWithOpts(func(o templatex.Option) map[string]any {
-    return fstore.FuncMap(
-        // fstore.WithLog(logz.AdapterKV{Log: log.Logger}),
-        fstore.WithTrust(true),
-        fstore.WithWorkDir("."),
-        fstore.WithExecuteTemplate(o.T),
-    )
+	return fstore.FuncMap(
+		fstore.WithLog(slog.Default()),
+		fstore.WithWorkDir("."),
+		fstore.WithExecuteTemplate(o.T),
+	)
 }))
 
 var buf bytes.Buffer
 err := tpl.Execute(
-    templatex.WithContent("{{.Count}} items are made of {{.Material}}"),
-    templatex.WithData(map[string]any{
-        "Count":    3,
-        "Material": "wood",
-    }),
-    templatex.WithIO(&buf),
+	templatex.WithContent("{{.Count}} items are made of {{.Material}}"),
+	templatex.WithData(map[string]any{
+		"Count":    3,
+		"Material": "wood",
+	}),
+	templatex.WithIO(&buf),
 )
 if err != nil {
-    log.Fatal().Err(err).Msg("failed to execute template")
+	log.Fatalf("failed to execute template: %v", err)
 }
 
 fmt.Println(buf.String())
 // Output:
 // 3 items are made of wood
+```
+
+The blank import of `github.com/rytsh/mugo/fstore/registry` is still required for the complete function set.
+
+## render
+
+The `render` package combines `templatex` and `fstore` for one-call rendering:
+
+```go
+import (
+	"fmt"
+	"log"
+
+	_ "github.com/rytsh/mugo/fstore/registry"
+	"github.com/rytsh/mugo/render"
+)
+
+output, err := render.ExecuteWithData(
+	`Hello {{ .Name }}`,
+	map[string]any{"Name": "mugo"},
+)
+if err != nil {
+	log.Fatal(err)
+}
+
+fmt.Println(string(output))
+// Output: Hello mugo
 ```
